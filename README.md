@@ -1,6 +1,6 @@
 # htspan mobsnvf filter
 
-The htspan mobsnvf filter is a toolkit for removing artifacts from high thoughput sequencing data. Supported damage types are
+The htspan mobsnvf filter is a toolkit for removing artifacts from high thoughput sequencing data. Supported damage types are:
 
 * FFPE
 * OXOG

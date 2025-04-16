@@ -38,12 +38,12 @@ echo -e "Use phi: $use_phi\n"
 
 ## Set up directories
 #### Don't use absolute paths
-base_dir="/home/moyukh/projects/mobsnvf_filter"
+base_dir="./"
 
 if [[ "$use_phi" == "true" ]]; then
-  out_dir="${base_dir}/no_wdl/dlazy_test/${sample_id}/known_phi/"
+  out_dir="${base_dir}/result/${sample_id}/known_phi/"
 else
-  out_dir="${base_dir}/no_wdl/dlazy_test/${sample_id}/unknown_phi/"
+  out_dir="${base_dir}/result/${sample_id}/unknown_phi/"
 fi
 mkdir -p "${out_dir}"
 
