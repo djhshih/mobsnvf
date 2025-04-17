@@ -58,7 +58,7 @@ echo -e "Use phi: $use_phi\n"
 
 ## Set up directories
 #### Don't use absolute paths
-base_dir="./"
+base_dir="."
 
 if [[ "$use_phi" == "true" ]]; then
   out_dir="${base_dir}/results/${sample_id}/known_phi/"
