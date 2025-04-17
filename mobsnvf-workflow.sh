@@ -6,16 +6,37 @@ damage_type="ffpe"
 fp_cut="1e-08"
 use_phi="true"
 
+## Prefix and suffix for VCF and BAM files
+pvcf=""
+svcf=""
+pbam=""
+sbam=""
 
 # Process command-line arguments for phi and sample id
 while [[ "$#" -gt 0 ]]; do
     case $1 in
-        -i|--i|--id|--sample_id)
+        -i|--i|--id|--sample-id)
             sample_id="$2"
             shift 2
             ;;
         --use-phi)
             use_phi="$2"
+            shift 2
+            ;;
+        --prefix-vcf|--pvcf|-pv)
+            pvcf="$2"
+            shift 2
+            ;;
+        --suffix-vcf|--svcf|-sv)
+            svcf="$2"
+            shift 2
+            ;;
+        --prefix-bam|--pbam|-pb)
+            pbam="$2"
+            shift 2
+            ;;
+        --suffix-bam|--sbam|-sb)
+            sbam="$2"
             shift 2
             ;;
         *)
@@ -35,24 +56,22 @@ echo -e "Using Parameters:"
 echo -e "Sample ID: $sample_id"
 echo -e "Use phi: $use_phi\n"
 
-
 ## Set up directories
 #### Don't use absolute paths
 base_dir="./"
 
 if [[ "$use_phi" == "true" ]]; then
-  out_dir="${base_dir}/result/${sample_id}/known_phi/"
+  out_dir="${base_dir}/results/${sample_id}/known_phi/"
 else
-  out_dir="${base_dir}/result/${sample_id}/unknown_phi/"
+  out_dir="${base_dir}/results/${sample_id}/unknown_phi/"
 fi
 mkdir -p "${out_dir}"
 
-bam="${base_dir}/bam/${sample_id}.bam"
-bai="${base_dir}/bam/${sample_id}.bai"
+bam="${base_dir}/bam/${pbam}${sample_id}${sbam}.bam"
+bai="${base_dir}/bam/${pbam}${sample_id}${sbam}.bai"
 ref="${base_dir}/ref/Homo_sapiens_assembly38.fasta"
-vcf="${base_dir}/vcf/${sample_id}_selected.vcf"
+vcf="${base_dir}/vcf/${pvcf}${sample_id}${svcf}.vcf"
 rscript="${base_dir}/wdl/fdr-failed.R"
-
 
 (
 echo -e "Inputs:"
@@ -102,6 +121,7 @@ else
 fi
 
 # Perform variant identification:
+## -g is the p-value cutoff. By setting it to zero we are disabling the p-value filter.
 hts-mobsnvf identify \
   -M freq \
   -t "${damage_type}" \
