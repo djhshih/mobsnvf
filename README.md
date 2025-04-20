@@ -88,7 +88,7 @@ An easy way to run multiple samples using this workflow is to use Dlazy. Check _
 
 You may use dlazy to run your samples in as follows:
 
-- Run the `list_samples.sh` script to obtain a list of your samples:
+- Run the `list_samples.py` script to obtain a list of your samples:
 
 ```bash
 python list_samples.py
