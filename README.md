@@ -93,9 +93,13 @@ You may use dlazy to run your samples in as follows:
 ```bash
 python list_samples.py
 ```
-This will generate a samples.txt file with listing the sample name of all your samples by referring to the `bam/` direcrtory.
+This will generate a samples.txt file with listing the sample name of all your samples by referring to the _`bam/`_ directory. 
 
-Then you may run your samples using:
+If your bam file name includes suffixes or prefixes along with the sample name, they may be declared using the `--suffix` and `--prefix` argument. 
+
+__Example:__ The prefix and suffix on __`prefix_sample_01_suffix.bam`__ may be omitted using __`--suffix _suffix --prefix prefix_`__ to just keep the sample name i.e. __sample_01__.
+
+Then you may run the workflow on your samples using:
 ```
 djobs workflow-mobsnvf --use-phi 'true' --sample_id
 dlazy job
