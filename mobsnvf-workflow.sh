@@ -39,6 +39,10 @@ while [[ "$#" -gt 0 ]]; do
             sbam="$2"
             shift 2
             ;;
+        --damage-type|--dt|-d)
+            damage_type="$2"
+            shift 2
+            ;;
         *)
             echo "Unknown parameter passed: $1"
             exit 1
@@ -71,7 +75,7 @@ bam="${base_dir}/bam/${pbam}${sample_id}${sbam}.bam"
 bai="${base_dir}/bam/${pbam}${sample_id}${sbam}.bai"
 ref="${base_dir}/ref/Homo_sapiens_assembly38.fasta"
 vcf="${base_dir}/vcf/${pvcf}${sample_id}${svcf}.vcf"
-rscript="${base_dir}/wdl/fdr-failed.R"
+rscript="${base_dir}/R/fdr-failed.R"
 
 (
 echo -e "Inputs:"

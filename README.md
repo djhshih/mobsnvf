@@ -1,166 +1,71 @@
-# htspan mobsnvf filter
+# HTSPAN MOBSNVF Filter
 
 The mobsnvf filter is a modue of htspan for removing artifacts from high thoughput sequencing data. Supported damage types are:
 
 * FFPE
 * OXOG
 
+This repository provides a pipeline for using the mobsnvf module of htspan for a production workflow.
+
 ## Setup Procedure
 
-### Dependencies
+Please refer to [djhshih/htspan](https://github.com/djhshih/htspan) for setup procedure and example of a minimalistic use case.
+
+## Dependencies
 * R >= 4.0
-* R Libraries: stringr, argparse
+* R Libraries: srtringr, argparser
+* GATK >= 4.2.2.0
 * gcc >= 4.8
 * bzip2 >= 1.0 (for htslib)
-* liblzma SDK >= 5.2.4 (for htslib)
-* libcurl SDK >= 7.64 (for htslib, any implementation)
+* liblzma-dev >= 5.2.4 (for htslib)
+* libcurl-dev >= 7.64 (for htslib, any implementation)
 
-### Optional dependencies for testing and development
+## Installing dependencies
 
-* samtools >= 1.8
-* python3 >= 3.6
-* boost >= 1.69
-* bcftools >= 1.3.1
+Follow the guideline in [GitHub: djhshih/htspan](https://github.com/djhshih/htspan) to install the dependencies for htspan.
 
-## Install Conda
-
-If the dependencies for this pipeline are not installed on your system, a simple way to get them is through conda.
-
-If your linux system doesn't have conda installed, download and install the latest version of miniconda. Skip this step if you already have conda installed on your system.
+Follow the instructions below to install the R, R package and GATK dependencies for this pipeline:
 
 ```bash
-wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-
-bash Miniconda3-latest-Linux-x86_64.sh
+sudo apt install r-base r-base-dev
+R -e 'install.packages(c("argparser","stringr"), repos="https://cloud.r-project.org")'
+conda install gatk4
 ```
 
-Follow the instructions and until conda is successfully installed in your system. This typically goes as follows:
+### Alternate method:
 
-- When prompted Enter `yes` to agree to the TOS.
+Alternatively, you may use the included Dockerfile to build and run a docker container which includes all the dependencies. This is covered at [GitHub: djhshih/htspan](https://github.com/djhshih/htspan).
 
-- Press **Return** to accept the default install location (`PREFIX=/Users/<USER>/miniconda3`), or enter another file path to specify an alternate installation directory. The installation might take a few minutes to complete.
-
-- When choosing initialization option, type `Yes`. This will conda modify your shell configuration to initialize conda whenever you open a new shell and to recognize conda commands automatically.
-
-
-## Create environment with necessary dependencies
-
-Now create a conda environment for running the hts-mobsnvf filter
-
-```bash
-conda create --name hts-mobsnvf
-```
-Aftewards, we activate this newly created environment and install the necessary dependencies for running hts-mobsnvf:
-
-```bash
-conda activate hts-mobsnvf
-
-conda install -c conda-forge -c bioconda r-base r-essentials r-stringr r-argparse bzip2 gatk4 git htslib
-```
-
-## Install hts-mobsnvf filter
-
-Now we can install the hts-mobsnvf filter in our system. Clone the github repo (make sure you have access since this is a private repo)
-
-```bash
-git clone https://github.com/djhshih/htspan
-cd htspan
-git submodule update --init --recursive
-make
-```
-
-If the compilation is successful, the binaries will appear in `bin`.
-
-The binaries may be added to `$PATH` if you want them to be accessible from any directory:
-
-- Open `~/.bashrc` file
-
-```bash
-nano ~/.bashrc
-```
-
-Now navigate to the end and add the following line to the file. 
-```txt
-export PATH="{path-to-bin-folder}:$PATH"
-```
-
-Replace `{path-to-bin-folder}` with the actual path to where htspan binaries are compiled. You may obtain this by navigating to the _`bin/`_ directory and entering `pwd` in the terminal.
-
-Press `Ctrl + O` and then `Enter` to save the file. And then press `Ctrl + X` to exit.
-
-Now re-initialize the shell by entering `exec bash`.
-
-Now __hts-mobsnvf__ should be accessible from any directory. You may test this by typing `hts-mobsnvf` in the terminal.
-
-## Minimalisitc Use Case
-
-The most straightforward way to use mobsnvf would be to call the `identify` program and pass in the __*statistics model*__, __*damage type*__, __*bam file*__, __*vcf file*__, __*p-value cutoff*__, and __*output name*__. 
-
-```
-hts-mobsnvf identify \
-  -M freq \
-  -t {damage_type} \
-  -b {path-to-bam} \
-  -V {path-to-vcf} \
-  -g 0 \
-  -o "{output-name}.snv" > {output-name}.tsv
-```
-
-Make sure your vcf and bam files are paired with their index files within their respective directories.
-
-**Parameters:**
-
-- `-M`: Model to use for identification or quantification. Choices are 'freq' or 'bayes'.
-
-- `-t`:  Type of damage to identify or quantify (e.g. what variant type to analyze). Choices are **'ffpe'** or **'oxog'**.
-
-- `-b`: Path to the BAM data being examined for damage. __Must be paired-end__.
-
-- `-V`: Path to the list of SNVs to be examined for damage identification. Valid formats are plain **TSV** or **VCF/BCF** (may be compressed with gzip or bgzip).
-
-- `-g`: P-value threshold for a variant to be considered damaged. Setting this to `0` will disable automatic filtering but statistics will still be recorded in the output file.
-
-- `-o`: Path for the output list of filtered SNVs.
-
-
-## Proper FFPE Artifact Filtering Workflow
-
-### Additional Dependencies
-
-Make sure GATK4 is installed and added to `$PATH`.
-
-* GATK4
-
-We can start by making a clone of the mobsnvf GitHub repository and navigating to the directory:
-
-```bash
-git clone git@github.com:djhshih/mobsnvf.git
-cd mobsnvf
-```
+## How to use this pipeline
 
 ### Sample Preparation
 
-This pipeline requires sequence alignment __BAM__ and called variants __VCF__ files. Therefore, place the BAM and VCF of your samples in their respective _`BAM/`_ and _`VCF/`_ directory.
+This pipeline requires sequence alignment (__BAM__) files and called variants (__VCF__) files. Hence, place the BAM and VCF of your samples in their respective _`BAM/`_ and _`VCF/`_ directory.
 
 __Important:__ Make sure the __BAM__ and __VCF__ files have the same name for each sample. Example: __`sample01.bam`__ and __`sample01.vcf`__.
 
-In case they don't you may add a prefix or suffix to the bam files using the `--prefix-bam` and `--suffix-bam` respectively. Similarly, you may add the prefix and suffix to the vcf files using the `--prefix-vcf` and `--suffix-vcf` parameters.
+In case your bam and vcf have prefixes or suffixes, you may use the `--prefix-bam` and `--suffix-bam` for declaring prefix and suffix to your bam file. Similarly, you may add the prefix and suffix to the vcf files using the `--prefix-vcf` and `--suffix-vcf` parameters.
 
-It also requires a reference genome to align against. The reference genomes may be obtained by navigating to the _`ref/`_ directory and running the `get.sh` script:
+__Example:__
+If your bam has the name `sample_01_aligned.bam` and your vcf have the name `sample_01_called.vcf`. You may declare this using: `--sample-id sample_01 --suffix-bam _aligned --suffix-vcf _called`
+
+### Get reference genome
+
+Run the `get_reference_genome.sh` script to download the reference genomes in the _`ref/`_ dirctory
 
 ```bash
-bash get.sh
+bash get_reference_genome.sh
 ```
 
 ### Running samples for filtering
 
-After placing the samples in the _`bcf/`_ and _`vcf/`_ directory, the pipeline may finally be run for applying FFPE artifact filtering to our samples.
+After placing the samples in the _`bcf/`_ and _`vcf/`_ directory, the pipeline may be run for FFPE artifact filtering.
 
 ```bash
 bash workflow-mobsnvf --use-phi 'true' --sample_id {your-sample-name} 
 ```
 
-The `--sample-id` field takes the sample name of the __BAM__ and __VCF__ files. For example, the `--sample-id` input for sample01.bam and sample01.vcf would be `--sample-id sample01`.
+The `--sample-id` field takes the sample name of the __BAM__ and __VCF__ files. For example, the `--sample-id` input for __`sample01.bam`__ and __`sample01.vcf`__ would be `--sample-id sample01`.
 
 The parameter __phi__ is an estimate of the extent of artificial DNA damage. The `--use-phi` flag being set to `true` will calculate phi and use it in when identifying artifacts. When this flag is set to `false` it will skip the phi calculation and proceed with artifact identification without fixing phi.
 
@@ -175,6 +80,27 @@ The outputs files are:
 - `{sample_name}_selected.vcf.idx` : Index of the `{sample_name}_selected.vcf`.
 - `{sample_name}_removed.vcf` : This contains the genetic variants which are presumably FFPE artifacts.
 - `{sample_name}_removed.vcf.idx` : Index of the `{sample_name}_removed.vcf`.
+
+## Running multiple samples
+
+An easy way to run multiple samples using this workflow is to use Dlazy. Check __[GitHub: djhshih/dlazy](https://github.com/djhshih/dlazy)__ for instructions on installation and basic use.
+
+You may use dlazy to run your samples in as follows:
+
+- Run the `list_samples.sh` script to obtain a list of your samples:
+
+```bash
+python list_samples.py
+```
+This will generate a samples.txt file with listing the sample name of all your samples by referring to the `bam/` direcrtory.
+
+Then you may run your samples using:
+```
+djobs workflow-mobsnvf --use-phi 'true' --sample_id
+dlazy job
+```
+
+
 
 
 
