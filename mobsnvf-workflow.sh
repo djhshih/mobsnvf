@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -eo pipefail
+
 ## User-provided inputs | Change as necessary
 sample_id=""
 damage_type="ffpe"
