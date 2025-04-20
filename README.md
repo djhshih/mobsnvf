@@ -76,7 +76,7 @@ The result for this workflow will be saved to the `results/` directory, followed
 
 The outputs files are:
 
-- `{sample_name}_ffpe.snv` : This contains the list of SNV files with their P-value.
+- `{sample_name}_ffpe.snv` : This contains the list of SNVs with their P-value.
 - `{sample_name}_selected.vcf` : This contains the genetic variants with FFPE Artifacts filtered out.
 - `{sample_name}_selected.vcf.idx` : Index of the `{sample_name}_selected.vcf`.
 - `{sample_name}_removed.vcf` : This contains the genetic variants which are presumably FFPE artifacts.
