@@ -15,6 +15,7 @@ Please refer to [djhshih/htspan](https://github.com/djhshih/htspan) for setup pr
 * R >= 4.0
 * R Libraries: srtringr, argparser
 * GATK >= 4.2.2.0
+* gsutil >= 5.00
 * gcc >= 4.8
 * bzip2 >= 1.0 (for htslib)
 * liblzma-dev >= 5.2.4 (for htslib)
