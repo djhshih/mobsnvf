@@ -25,12 +25,12 @@ Please refer to [djhshih/htspan](https://github.com/djhshih/htspan) for setup pr
 
 Follow the guideline in [GitHub: djhshih/htspan](https://github.com/djhshih/htspan) to install the dependencies for htspan.
 
-Follow the instructions below to install the R, R package and GATK dependencies for this pipeline:
+Follow the instructions below to install the R, R package, gsuitl and GATK dependencies for this pipeline:
 
 ```bash
 sudo apt install r-base r-base-dev
 R -e 'install.packages(c("argparser","stringr"), repos="https://cloud.r-project.org")'
-conda install gatk4
+conda install -c bioconda -c conda-forge gatk4 gsutil
 ```
 
 ### Alternate method:
