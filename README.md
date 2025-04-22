@@ -1,6 +1,6 @@
 # HTSPAN MOBSNVF Filter
 
-The mobsnvf filter is a modue of htspan for removing artifacts from high thoughput sequencing data. Supported damage types are:
+The mobsnvf filter is a module of htspan for removing artifacts from high throughput sequencing data. Supported damage types are:
 
 * FFPE
 * OXOG
@@ -52,7 +52,7 @@ If your bam has the name `sample_01_aligned.bam` and your vcf have the name `sam
 
 ### Get reference genome
 
-Run the `get_reference_genome.sh` script to download the reference genomes in the _`ref/`_ dirctory
+Run the `get_reference_genome.sh` script to download the reference genomes in the _`ref/`_ directory
 
 ```bash
 bash get_reference_genome.sh
@@ -95,7 +95,7 @@ python list_samples.py
 ```
 This will generate a samples.txt file with listing the sample name of all your samples by referring to the _`bam/`_ directory. 
 
-If your bam file name includes suffixes or prefixes along with the sample name, they may be declared using the `--suffix` and `--prefix` argument. 
+If your bam file name includes suffixes or prefixes along with the sample name, they may be declared using the `--suffix` and `--prefix` arguments. 
 
 __Example:__ The prefix and suffix on __`prefix_sample_01_suffix.bam`__ may be omitted using __`--suffix _suffix --prefix prefix_`__ to just keep the sample name i.e. __sample_01__.
 
