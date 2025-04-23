@@ -93,7 +93,7 @@ If your bam has the name `sample_01_aligned.bam` and your vcf has the name `samp
 #### Use your own:
 If you are going to use your own reference genome, place the __fasta__ files in the `ref/` directory and make sure they are __indexed__.
 
-Custom reference genome needs to be declared to the pipeline using the `--ref {file-name}.ref`. Replace _{file-name}_ with actual the file name.
+Custom reference genome needs to be declared to the pipeline using the `--ref {file-name}`. Replace _{file-name}_ with actual the file name.
 
 #### Download a reference genome:
 By default the pipeline will look for `Homo_sapiens_assembly38.fasta` which may be obtained by running the `get_reference_genome.sh` script to download this reference genome into the _`ref/`_ directory. 
