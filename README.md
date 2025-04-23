@@ -7,9 +7,6 @@ The mobsnvf filter is a module of htspan for removing artifacts from high throug
 
 This repository provides a pipeline for using the mobsnvf module of htspan for a production workflow.
 
-## Setup Procedure
-
-Please refer to [djhshih/htspan](https://github.com/djhshih/htspan) for setup procedure and example of a minimalistic use case.
 
 ## Dependencies
 * R >= 4.0
@@ -21,38 +18,92 @@ Please refer to [djhshih/htspan](https://github.com/djhshih/htspan) for setup pr
 * liblzma-dev >= 5.2.4 (for htslib)
 * libcurl-dev >= 7.64 (for htslib, any implementation)
 
+
+## Setup Procedure
+
+If your system does not have git, install git:
+
+```bash
+sudo apt install git
+```
+
+### Compile htspan
+Please refer to __[djhshih/htspan](https://github.com/djhshih/htspan)__ for setting up __htspan__ and an example of a minimalistic workflow.
+
+### Clone mobsnvf repo
+Then clone this `mobsnvf` repo:
+```bash
+git clone https://github.com/djhshih/mobsnvf.git
+```
+
+
 ## Installing dependencies
 
-Follow the guideline in [GitHub: djhshih/htspan](https://github.com/djhshih/htspan) to install the dependencies for htspan.
+The dependencies for __htspan__ may be installed in Debian/Ubuntu based distributions using this command:
+```bash
+sudo apt install gcc bzip2 liblzma-dev libcurl4-openssl-dev
+```
 
-Follow the instructions below to install the R, R package, gsuitl and GATK dependencies for this pipeline:
+This pipeline also relies on R, R packages and GATK. These may be installed as follows:
 
 ```bash
 sudo apt install r-base r-base-dev
 R -e 'install.packages(c("argparser","stringr"), repos="https://cloud.r-project.org")'
-conda install -c bioconda -c conda-forge gatk4 gsutil
+conda install -c bioconda gatk4
 ```
 
-### Alternate method:
+If your system does not have __Conda__, you may follow these __[installation instructions](https://www.anaconda.com/docs/getting-started/miniconda/install#linux)__ or install GATK4 through other means.
 
-Alternatively, you may use the included Dockerfile to build and run a docker container which includes all the dependencies. This is covered at [GitHub: djhshih/htspan](https://github.com/djhshih/htspan).
+### Alternate method
+
+Alternatively, you may use the `Dockerfile` included with this repo to build and run a docker container. This solves all dependencies for compiling htspan and running the pipeline.
+
+If docker is not installed on your system, follow instructions __[here](https://docs.docker.com/engine/install/)__ to install docker or contact your system administrator if you don't have the privileges.
+
+Then navigate to the cloned `mobsnvf/` repo and use the following commands to make a Docker image and run an interactive Docker container.
+
+```bash
+docker build -t htspan .
+docker run --rm -it htspan
+```
+
+Alternatively, you may use the `-v` flag to mount your current working directory to your docker container:
+
+```bash
+docker run --rm -it -v .:/home/ubuntu htspan
+```
+
+This will create and run an interactive Docker container, mounting the current working directory and including all the dependencies.
 
 ## How to use this pipeline
 
 ### Sample Preparation
 
-This pipeline requires sequence alignment (__BAM__) files and called variants (__VCF__) files. Hence, place the BAM and VCF of your samples in their respective _`BAM/`_ and _`VCF/`_ directory.
+This pipeline requires sequence alignment (__BAM__) files and called variants (__VCF__) files. Hence, place the BAM and VCF of your samples in their respective _`bam/`_ and _`vcf/`_ directory.
 
-__Important:__ Make sure the __BAM__ and __VCF__ files have the same name for each sample. Example: __`sample01.bam`__ and __`sample01.vcf`__.
+__Easiest method:__ Make sure the __BAM__ and __VCF__ files have the same name for each sample. Example: __`sample01.bam`__ and __`sample01.vcf`__.
 
 In case your bam and vcf have prefixes or suffixes, you may use the `--prefix-bam` and `--suffix-bam` for declaring prefix and suffix to your bam file. Similarly, you may add the prefix and suffix to the vcf files using the `--prefix-vcf` and `--suffix-vcf` parameters.
 
 __Example:__
 If your bam has the name `sample_01_aligned.bam` and your vcf have the name `sample_01_called.vcf`. You may declare this using: `--sample-id sample_01 --suffix-bam _aligned --suffix-vcf _called`
 
-### Get reference genome
+### Reference genome
 
-Run the `get_reference_genome.sh` script to download the reference genomes in the _`ref/`_ directory
+#### Use your own:
+If you are going to use your own reference genome, place the __fasta__ files in the `ref/` directory and make sure they are __indexed__.
+
+Custom reference genome needs to be declared to the pipeline using the `--ref {file-name}.ref`. Replace _{file-name}_ with actual the file name.
+
+#### Download a reference genome:
+By default the pipeline will look for `Homo_sapiens_assembly38.fasta` which may be obtained by running the `get_reference_genome.sh` script to download this reference genome into the _`ref/`_ directory. 
+
+Downloading the reference genome requires __gsutil__. If this is not installed, you may obtain this by running:
+
+```bash
+conda install -c conda-forge gsutil
+```
+Then download the reference genome:
 
 ```bash
 bash get_reference_genome.sh
@@ -84,7 +135,7 @@ The outputs files are:
 
 ## Running multiple samples
 
-An easy way to run multiple samples using this workflow is to use Dlazy. Check __[GitHub: djhshih/dlazy](https://github.com/djhshih/dlazy)__ for instructions on installation and basic use.
+An easy way to run multiple samples using this workflow is to use Dlazy. Check __[djhshih/dlazy](https://github.com/djhshih/dlazy)__ for instructions on installation and basic use.
 
 You may use dlazy to run your samples in as follows:
 

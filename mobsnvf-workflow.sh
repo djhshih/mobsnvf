@@ -13,6 +13,7 @@ pvcf=""
 svcf=""
 pbam=""
 sbam=""
+ref_name="Homo_sapiens_assembly38.fasta"
 
 # Process command-line arguments for phi and sample id
 while [[ "$#" -gt 0 ]]; do
@@ -45,6 +46,10 @@ while [[ "$#" -gt 0 ]]; do
             damage_type="$2"
             shift 2
             ;;
+        --reference-genome|--ref|-r)
+            ref_name="$2"
+            shift 2
+            ;;
         *)
             echo "Unknown parameter passed: $1"
             exit 1
@@ -75,7 +80,7 @@ mkdir -p "${out_dir}"
 
 bam="${base_dir}/bam/${pbam}${sample_id}${sbam}.bam"
 bai="${base_dir}/bam/${pbam}${sample_id}${sbam}.bai"
-ref="${base_dir}/ref/Homo_sapiens_assembly38.fasta"
+ref="${base_dir}/ref/${ref_name}"
 vcf="${base_dir}/vcf/${pvcf}${sample_id}${svcf}.vcf"
 rscript="${base_dir}/R/fdr-failed.R"
 
