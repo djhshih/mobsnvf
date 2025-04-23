@@ -83,10 +83,10 @@ This pipeline requires sequence alignment (__BAM__) files and called variants (_
 
 __Easiest method:__ Make sure the __BAM__ and __VCF__ files have the same name for each sample. Example: __`sample01.bam`__ and __`sample01.vcf`__.
 
-In case your bam and vcf have prefixes or suffixes, you may use the `--prefix-bam` and `--suffix-bam` for declaring prefix and suffix to your bam file. Similarly, you may add the prefix and suffix to the vcf files using the `--prefix-vcf` and `--suffix-vcf` parameters.
+In case your bam and vcf have prefixes or suffixes, you may use the `--prefix-bam` and `--suffix-bam` for declaring prefix and suffix for your bam file. Similarly, you may declare the prefix and suffix for the vcf files using the `--prefix-vcf` and `--suffix-vcf` parameters.
 
 __Example:__
-If your bam has the name `sample_01_aligned.bam` and your vcf have the name `sample_01_called.vcf`. You may declare this using: `--sample-id sample_01 --suffix-bam _aligned --suffix-vcf _called`
+If your bam has the name `sample_01_aligned.bam` and your vcf has the name `sample_01_called.vcf`. You may declare this using: `--sample-id sample_01 --suffix-bam _aligned --suffix-vcf _called`
 
 ### Reference genome
 
