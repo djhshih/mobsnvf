@@ -63,14 +63,14 @@ If docker is not installed on your system, follow instructions __[here](https://
 Then navigate to the cloned `mobsnvf/` repo and use the following commands to make a Docker image and run an interactive Docker container.
 
 ```bash
-docker build -t htspan .
-docker run --rm -it htspan
+docker build -t mobsnvf .
+docker run --rm -it mobsnvf
 ```
 
 Alternatively, you may use the `-v` flag to mount your current working directory to your docker container:
 
 ```bash
-docker run --rm -it -v .:/home/ubuntu htspan
+docker run --rm -it -v .:/home/ubuntu mobsnvf
 ```
 
 This will create and run an interactive Docker container, mounting the current working directory and including all the dependencies.
