@@ -79,7 +79,7 @@ This will create and run an interactive Docker container, mounting the current w
 
 ### Sample Preparation
 
-This pipeline requires sequence alignment (__BAM__) files and called variants (__VCF__) files. Hence, place the BAM and VCF of your samples in their respective _`bam/`_ and _`vcf/`_ directory.
+This pipeline requires sequence alignment (__BAM__) files and called variants (__VCF__) files. Hence, place the BAM and VCF of your samples in their respective _`bam/`_ and _`vcf/`_ directory along with their associated index files.
 
 __Easiest method:__ Make sure the __BAM__ and __VCF__ files have the same name for each sample. Example: __`sample01.bam`__ and __`sample01.vcf`__.
 
