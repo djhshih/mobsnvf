@@ -32,7 +32,7 @@ sudo apt install git
 ```
 
 ### Compile htspan
-Please refer to __[djhshih/htspan](https://github.com/djhshih/htspan)__ for setting up __htspan__ and for an example of a minimalistic workflow.
+Please refer to __[djhshih/htspan](https://github.com/djhshih/htspan)__ for instructions on setting up __htspan__ and for an example of a minimalistic workflow.
 
 ### Clone mobsnvf repo
 Then clone this `mobsnvf` repo:
@@ -45,7 +45,7 @@ git clone https://github.com/djhshih/mobsnvf.git
 
 The dependencies for __htspan__ may be installed in Debian/Ubuntu based distributions using this command:
 ```bash
-sudo apt install gcc bzip2 liblzma-dev libcurl4-openssl-dev
+sudo apt install build-essential bzip2 liblzma-dev libcurl4-openssl-dev zlib1g-dev libbz2-dev
 ```
 
 This pipeline also relies on R, R packages and GATK. These may be installed as follows:
