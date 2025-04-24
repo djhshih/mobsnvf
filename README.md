@@ -114,7 +114,7 @@ bash get_reference_genome.sh
 After placing the samples in the _`bcf/`_ and _`vcf/`_ directory, the pipeline may be run for FFPE artifact filtering.
 
 ```bash
-bash mobsnvf-workflow.sh --use-phi 'true' --sample_id {your-sample-name} 
+bash mobsnvf-workflow.sh --use-phi 'true' --sample-id {your-sample-name} 
 ```
 
 The `--sample-id` field takes the sample name of the __BAM__ and __VCF__ files. For example, the `--sample-id` input for __`sample01.bam`__ and __`sample01.vcf`__ would be `--sample-id sample01`.
@@ -155,7 +155,7 @@ This will generate a `samples.txt` file with listing the sample name of all your
 
 Then the pipeline can be run using:
 ```
-djobs workflow-mobsnvf --use-phi 'true' --sample_id
+djobs workflow-mobsnvf --use-phi 'true' --sample-id
 dlazy job
 ```
 
@@ -175,7 +175,7 @@ python list_samples.py --suffix _suffix --prefix prefix_
 Then the pipeline with multiple samples can be run with **Dlazy** using:
 
 ```
-djobs ./mobsnvf-workflow.sh --use-phi 'true' --prefix-bam prefix_ --prefix-vcf prefix_ --suffix-bam _suffix --suffix-vcf _suffix --sample_id
+djobs ./mobsnvf-workflow.sh --use-phi 'true' --prefix-bam prefix_ --prefix-vcf prefix_ --suffix-bam _suffix --suffix-vcf _suffix --sample-id
 
 dlazy job
 ```
