@@ -3,12 +3,13 @@ FROM ubuntu
 WORKDIR /home/ubuntu
 
 # Install OS packages
-RUN apt-get update && apt-get install -y \
-    wget bzip2 \
-    r-base r-base-dev \
-    gcc git \
+RUN apt update -y && apt upgrade -y \
+    && apt install -y \
+    wget bzip2 git cmake gcc g++ \
     liblzma-dev libcurl4-openssl-dev \
-    && rm -rf /var/lib/apt/lists/*
+    zlib1g-dev libbz2-dev \
+    r-base r-base-dev \
+    && rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 
 # Install R packages via CRAN
 RUN R -e 'install.packages(c("argparser","stringr"), repos="https://cloud.r-project.org")'
