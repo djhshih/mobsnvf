@@ -28,7 +28,7 @@ sudo apt install git
 ```
 
 ### Compile htspan
-Please refer to __[djhshih/htspan](https://github.com/djhshih/htspan)__ for setting up __htspan__ and an example of a minimalistic workflow.
+Please refer to __[djhshih/htspan](https://github.com/djhshih/htspan)__ for setting up __htspan__ and for an example of a minimalistic workflow.
 
 ### Clone mobsnvf repo
 Then clone this `mobsnvf` repo:
@@ -60,7 +60,7 @@ Alternatively, you may use the `Dockerfile` included with this repo to build and
 
 If docker is not installed on your system, follow instructions __[here](https://docs.docker.com/engine/install/)__ to install docker or contact your system administrator if you don't have the privileges.
 
-Then navigate to the cloned `mobsnvf/` repo and use the following commands to make a Docker image and run an interactive Docker container.
+Then navigate to the cloned `mobsnvf/` repo and use the following commands to make a Docker image and run an interactive Docker container:
 
 ```bash
 docker build -t mobsnvf .
@@ -81,7 +81,7 @@ This will create and run an interactive Docker container, mounting the current w
 
 This pipeline requires sequence alignment (__BAM__) files and called variants (__VCF__) files. Hence, place the BAM and VCF of your samples in their respective _`bam/`_ and _`vcf/`_ directory along with their associated index files.
 
-__Easiest method:__ Make sure the __BAM__ and __VCF__ files have the same name for each sample. Example: __`sample01.bam`__ and __`sample01.vcf`__.
+__Easiest method:__ Make sure the __BAM__ and __VCF__ files have the same file name for each sample. Example: __`sample01.bam`__ and __`sample01.vcf`__.
 
 In case your bam and vcf have prefixes or suffixes, you may use the `--prefix-bam` and `--suffix-bam` for declaring prefix and suffix for your bam file. Similarly, you may declare the prefix and suffix for the vcf files using the `--prefix-vcf` and `--suffix-vcf` parameters.
 
@@ -90,12 +90,12 @@ If your bam has the name `sample_01_aligned.bam` and your vcf has the name `samp
 
 ### Reference genome
 
-#### Use your own:
+#### Using your own:
 If you are going to use your own reference genome, place the __fasta__ files in the `ref/` directory and make sure they are __indexed__.
 
 Custom reference genome needs to be declared to the pipeline using the `--ref {file-name}`. Replace _{file-name}_ with actual the file name.
 
-#### Download a reference genome:
+#### Downloading a reference genome:
 By default the pipeline will look for `Homo_sapiens_assembly38.fasta` which may be obtained by running the `get_reference_genome.sh` script to download this reference genome into the _`ref/`_ directory. 
 
 Downloading the reference genome requires __gsutil__. If this is not installed, you may obtain this by running:
@@ -103,7 +103,7 @@ Downloading the reference genome requires __gsutil__. If this is not installed, 
 ```bash
 conda install -c conda-forge gsutil
 ```
-Then download the reference genome:
+Then download the reference genome using:
 
 ```bash
 bash get_reference_genome.sh
@@ -119,7 +119,14 @@ bash workflow-mobsnvf --use-phi 'true' --sample_id {your-sample-name}
 
 The `--sample-id` field takes the sample name of the __BAM__ and __VCF__ files. For example, the `--sample-id` input for __`sample01.bam`__ and __`sample01.vcf`__ would be `--sample-id sample01`.
 
-The parameter __phi__ is an estimate of the extent of artificial DNA damage. The `--use-phi` flag being set to `true` will calculate phi and use it in when identifying artifacts. When this flag is set to `false` it will skip the phi calculation and proceed with artifact identification without fixing phi.
+#### Phi
+The parameter __phi__ is an estimate of the extent of artificial DNA damage. 
+
+Setting the `--use-phi` flag to `true` will estimate phi with `hts-mobsnvf quantify` and use it in when identifying artifacts with `hts-mobsnvf identify`. 
+
+When `--use-phi` is set to `false`, phi estimation will be skipped and `hts-mobsnvf identify` will estimate the extent of DNA damage (phi) individually for each SNV site.
+
+Typically, accuracy is bit better if phi is estimated using `quantify` first, and then provided to `identify`. Hence, it is generally recommended to set `--use-phi` to **true**.
 
 #### Results
 
@@ -135,7 +142,7 @@ The outputs files are:
 
 ## Running multiple samples
 
-An easy way to run multiple samples using this workflow is to use Dlazy. Check __[djhshih/dlazy](https://github.com/djhshih/dlazy)__ for instructions on installation and basic use.
+An easy way to run multiple samples using this workflow is to use __Dlazy__. Check __[djhshih/dlazy](https://github.com/djhshih/dlazy)__ for instructions on installation and basic use.
 
 You may use dlazy to run your samples in as follows:
 
@@ -144,17 +151,38 @@ You may use dlazy to run your samples in as follows:
 ```bash
 python list_samples.py
 ```
-This will generate a samples.txt file with listing the sample name of all your samples by referring to the _`bam/`_ directory. 
+This will generate a `samples.txt` file with listing the sample name of all your samples by referring to the _`bam/`_ directory. 
 
-If your bam file name includes suffixes or prefixes along with the sample name, they may be declared using the `--suffix` and `--prefix` arguments. 
-
-__Example:__ The prefix and suffix on __`prefix_sample_01_suffix.bam`__ may be omitted using __`--suffix _suffix --prefix prefix_`__ to just keep the sample name i.e. __sample_01__.
-
-Then you may run the workflow on your samples using:
+Then the pipeline can be run using:
 ```
 djobs workflow-mobsnvf --use-phi 'true' --sample_id
 dlazy job
 ```
+
+### Dealing with prefixes and suffixes
+
+If your bam file name includes suffixes or prefixes along with the sample name, they may be declared using the `--suffix` and `--prefix` arguments to omit them when generating the sample list.
+
+#### Example
+Imagine you have a bam file named `prefix_sample_01_suffix.bam` and a vcf file named `prefix_sample_01_suffix.vcf`. 
+
+As the sample list is generated based on the bam files present in the `bam/` directory, the prefix and suffix can be omitted during sample list generation using __`--suffix _suffix --prefix prefix_`__ to just keep the sample name i.e. __sample_01__:
+
+ ```bash
+python list_samples.py --suffix _suffix --prefix prefix_
+ ```
+
+Then the pipeline with multiple samples can be run with **Dlazy** using:
+
+```
+djobs workflow-mobsnvf --use-phi 'true' --prefix-bam prefix_ --prefix-vcf prefix_ --suffix-bam _suffix --suffix-vcf _suffix --sample_id
+
+dlazy job
+```
+
+
+
+
 
 
 
