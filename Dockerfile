@@ -5,7 +5,7 @@ WORKDIR /home/ubuntu
 # Install OS packages
 RUN apt update -y && apt upgrade -y \
     && apt install -y \
-    wget bzip2 git cmake gcc g++ \
+    wget bzip2 git build-essential \
     liblzma-dev libcurl4-openssl-dev \
     zlib1g-dev libbz2-dev \
     r-base r-base-dev \

@@ -13,10 +13,14 @@ This repository provides a pipeline for using the mobsnvf module of htspan for a
 * R Libraries: srtringr, argparser
 * GATK >= 4.2.2.0
 * gsutil >= 5.00
-* gcc >= 4.8
 * bzip2 >= 1.0 (for htslib)
-* liblzma-dev >= 5.2.4 (for htslib)
+* cmake
+* gcc >= 4.8
+* g++
+* libbz2-dev
 * libcurl-dev >= 7.64 (for htslib, any implementation)
+* liblzma-dev >= 5.2.4 (for htslib)
+* zlib1g-dev
 
 
 ## Setup Procedure
