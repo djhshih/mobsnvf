@@ -4,6 +4,7 @@ import os
 import argparse
 
 # %%
+## Parsing the command line arguments
 parser = argparse.ArgumentParser(
     description="Strip an optional prefix/suffix from bam file names"
 )
@@ -21,8 +22,10 @@ parser.add_argument(
 args = parser.parse_args()
 
 # %%
+## Listing the bam files available in the bam directory
 sample_paths = glob.glob("bam/*.bam")
 
+## Removing the prefix and suffix from the sample names
 sample_names = [
     os.path.basename(p)
       .removesuffix(".bam")
@@ -32,6 +35,7 @@ sample_names = [
 ]
 
 # %%
+## Writing the sample names to a file
 with open("samples.txt", "w") as sample:
     for name in sample_names:
         sample.write(f"{name}\n")
