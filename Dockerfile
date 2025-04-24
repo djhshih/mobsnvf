@@ -28,7 +28,9 @@ RUN printf '%s\n' \
     'conda activate base' \
     > /etc/profile.d/conda-base.sh
 
-RUN echo -e '\nsource /opt/conda/etc/profile.d/conda.sh && conda activate base' >> /root/.bashrc
+RUN echo '' >> /root/.bashrc \
+    && echo '# Initialize conda' >> /root/.bashrc \
+    && echo 'source /opt/conda/etc/profile.d/conda.sh && conda activate base' >> /root/.bashrc
 
 # Install GATK4 and gsutil
 RUN conda install -y -c bioconda -c conda-forge gatk4 gsutil \
