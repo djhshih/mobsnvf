@@ -159,7 +159,7 @@ This will generate a `samples.txt` file with listing the sample name of all your
 
 Then the pipeline can be run using:
 ```
-djobs workflow-mobsnvf --use-phi 'true' --sample-id
+djobs ./mobsnvf-workflow.sh --use-phi 'true' --sample-id
 dlazy job
 ```
 
