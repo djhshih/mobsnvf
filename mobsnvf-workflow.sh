@@ -303,8 +303,8 @@ gatk IndexFeatureFile \
   -I "${filtered_vcf}" \
   -O "${filtered_vcf_index}"
 
-echo -e "Selected VCF (final): ${filtered_vcf}"
-echo -e "Selected VCF index (final): ${filtered_vcf_index}\n"
+echo -e "Filtered VCF (final): ${filtered_vcf}"
+echo -e "Filtered VCF index (final): ${filtered_vcf_index}\n"
 
 
 ## Remove Intermediate files
@@ -331,9 +331,9 @@ echo -e "${n}) artifacts_vcf         = ${artifacts_vcf}"
 ((n++))
 echo -e "${n}) artifacts_vcf_index   = ${artifacts_vcf_index}"
 ((n++))
-echo -e "${n}) selected_vcf        = ${filtered_vcf}"
+echo -e "${n}) filtered_vcf        = ${filtered_vcf}"
 ((n++))
-echo -e "${n}) selected_vcf_index  = ${filtered_vcf_index}"
+echo -e "${n}) filtered_vcf_index  = ${filtered_vcf_index}"
 
 ## Log the output
 ) 2>&1 | tee "${out_dir}/${sample_id}.log"
