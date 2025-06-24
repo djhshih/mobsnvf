@@ -2,203 +2,201 @@
 
 The mobsnvf filter is a module of htspan for removing artifacts from high throughput sequencing data. Supported damage types are:
 
-* FFPE
-* OXOG
+*   FFPE
+*   OXOG
 
 This repository provides a pipeline for using the mobsnvf module of htspan for a production workflow.
 
-
 ## Dependencies
-* R >= 4.0
-* R Libraries: srtringr, argparser
-* GATK >= 4.2.2.0
-* gsutil >= 5.00
-* bzip2 >= 1.0 (for htslib)
-* cmake
-* gcc >= 4.8
-* g++
-* libbz2-dev
-* libcurl-dev >= 7.64 (for htslib, any implementation)
-* liblzma-dev >= 5.2.4 (for htslib)
-* zlib1g-dev
 
+*   R >= 4.0
+*   GATK >= 4.2.2.0
+*   gsutil >= 5.00
+*   bzip2 >= 1.0 (for htslib)
+*   cmake
+*   gcc >= 4.8
+*   g++
+*   libbz2-dev
+*   libcurl-dev >= 7.64 (for htslib, any implementation)
+*   liblzma-dev >= 5.2.4 (for htslib)
+*   zlib1g-dev
+
+### R libraries:
+*   `stringr`
+*   `argparser`
 
 ## Setup Procedure
 
-If your system does not have git, install git:
+If your system does git installed, please setup and configure git first. You may take a look here for a **[demonstration](https://github.com/djhshih/setup-linux)**.
 
 ```bash
 sudo apt install git
 ```
 
 ### Compile htspan
-Please refer to __[djhshih/htspan](https://github.com/djhshih/htspan)__ for instructions on setting up __htspan__ and for an example of a minimalistic workflow.
+
+Please refer to **[djhshih/htspan]** for instructions on setting up **htspan** and for an example of a minimalistic workflow.
 
 ### Clone mobsnvf repo
+
 Then clone this `mobsnvf` repo:
+
 ```bash
 git clone https://github.com/djhshih/mobsnvf.git
+cd mobsnvf
 ```
-
 
 ## Installing dependencies
 
-The dependencies for __htspan__ may be installed in Debian/Ubuntu based distributions using this command:
-```bash
-sudo apt install build-essential bzip2 liblzma-dev libcurl4-openssl-dev zlib1g-dev libbz2-dev
-```
+The dependencies for **htspan** and ways to install them are mentioned in it's respective repostory:
 
-This pipeline also relies on R, R packages and GATK. These may be installed as follows:
+This pipeline also relies on R, R packages and GATK.
+
+GATK can be installed according to the [instructions provided here](https://gatk.broadinstitute.org/hc/en-us/articles/360036194592-Getting-started-with-GATK4).
+
+The R packages may be installed as follows:
 
 ```bash
 sudo apt install r-base r-base-dev
 R -e 'install.packages(c("argparser","stringr"), repos="https://cloud.r-project.org")'
-conda install -c bioconda gatk4
 ```
-
-If your system does not have __Conda__, you may follow these __[installation instructions](https://www.anaconda.com/docs/getting-started/miniconda/install#linux)__ or install GATK4 through other means.
 
 ### Alternate method
 
 Alternatively, you may use the `Dockerfile` included with this repo to build and run a docker container. This solves all dependencies for compiling htspan and running the pipeline.
 
-If docker is not installed on your system, follow instructions __[here](https://docs.docker.com/engine/install/)__ to install docker or contact your system administrator if you don't have the privileges.
+If docker is not installed on your system, follow instructions **[here]** to install docker or contact your system administrator if you don't have the privileges.
 
 Then navigate to the cloned `mobsnvf/` repo and use the following commands to make a Docker image and run an interactive Docker container:
 
 ```bash
 docker build -t mobsnvf .
-docker run --rm -it mobsnvf
+docker run --rm -it -v .:/work -w /work mobsnvf
 ```
 
-Alternatively, you may use the `-v` flag to mount your current working directory to your docker container:
-
-```bash
-docker run --rm -it -v .:/home/ubuntu mobsnvf
-```
-
-This will create and run an interactive Docker container, mounting the current working directory and including all the dependencies.
+This will create and run an interactive Docker container, mounting the current directory into the `/work` directory inside the container and setting it as the working directory.
+---
 
 ## How to use this pipeline
 
-### Sample Preparation
+The workflow requires explicit file paths for inputs.
 
-This pipeline requires sequence alignment (__BAM__) files and called variants (__VCF__) files. Hence, place the BAM and VCF of your samples in their respective _`bam/`_ and _`vcf/`_ directory along with their associated index files.
+### Command-Line Arguments
 
-__Easiest method:__ Make sure the __BAM__ and __VCF__ files have the same file name for each sample. Example: __`sample01.bam`__ and __`sample01.vcf`__.
+| Argument | Alias(es) | Required? | Default | Description |
+| :--- | :--- | :--- | :--- | :--- |
+| `--bam-path` | `-b`, `--bam` | **Yes** | | Path to the input BAM file. Must be indexed (`.bai`). |
+| `--vcf-path` | `-v`, `--vcf` | **Yes** | | Path to the input VCF file. Must be indexed (`.tbi` or `.csi` if gzipped). |
+| `--ref-path` | `-r`, `--ref` | **Yes** | | Path to the reference genome FASTA file. Must be indexed (`.fai`). |
+| `--sample-id` | `-i`, `--id` | No | Inferred from VCF | A unique identifier for the sample. If not provided, it will be automatically derived from the VCF filename. |
+| `--use-phi` | | No | `true` | Set to `true` to perform phi estimation or `false` to skip it. |
+| `--damage-type`| `-d`, `--damage` | No | `ffpe` | The type of DNA damage to model. Supported values are `ffpe` and `oxog`. |
+| `--out-dir` | `-o`, `--out` | No | `./result` | The base directory where results will be saved. |
+| `--fp-cut` | | No | `0.5` | False positive cutoff value for the FDR filter step. |
 
-In case your bam and vcf have prefixes or suffixes, you may use the `--prefix-bam` and `--suffix-bam` for declaring prefix and suffix for your bam file. Similarly, you may declare the prefix and suffix for the vcf files using the `--prefix-vcf` and `--suffix-vcf` parameters.
+### Example Usage
 
-__Example:__
-If your bam has the name `sample_01_aligned.bam` and your vcf has the name `sample_01_called.vcf`. You may declare this using: `--sample-id sample_01 --suffix-bam _aligned --suffix-vcf _called`
+Below is a typical command to run the pipeline for a single sample. You must provide the paths to your BAM, VCF, and reference genome.
 
-### Reference genome
-
-#### Using your own:
-If you are going to use your own reference genome, place the __fasta__ files in the `ref/` directory and make sure they are __indexed__.
-
-Custom reference genome needs to be declared to the pipeline using the `--ref {file-name}`. Replace _{file-name}_ with actual the file name.
-
-#### Downloading a reference genome:
-By default the pipeline will look for `Homo_sapiens_assembly38.fasta` which may be obtained by running the `get_reference_genome.sh` script to download this reference genome into the _`ref/`_ directory. 
-
-Downloading the reference genome requires __gsutil__. If this is not installed, you may obtain this by running:
+**Note:** It is important that the reference fasta provided is the same reference which was used to generate the BAM file. 
 
 ```bash
-conda install -c conda-forge gsutil
+bash mobsnvf-workflow.sh \
+    --sample-id "sample_name" \
+    --bam-path "/path/to/data/bams/sample01.bam" \
+    --vcf-path "/path/to/data/vcfs/sample01.vcf.gz" \
+    --ref-path "/path/to/genomes/bam.specific.fasta" \
+    --damage-type "ffpe" \
+    --use-phi "true" \
+    --out-dir "/path/to/output"
 ```
-Then download the reference genome using:
+
+### Reference Genome
+
+If you are sure that your BAM uses a standard hg38 reference genome, you can use the `get.sh` script included in the ref directory to download it:
+
+**Note:** This requires gsutil to be installed on your system. If you don't have gsutil, you can install it by following the instructions [here](https://cloud.google.com/storage/docs/gsutil_install).
 
 ```bash
-bash get_reference_genome.sh
+cd ref
+bash get.sh
 ```
 
-### Running samples for filtering
+### Testing the Pipeline with Example Data
 
-After placing the samples in the _`bcf/`_ and _`vcf/`_ directory, the pipeline may be run for FFPE artifact filtering.
+This repository includes an `example-data` directory containing a sample BAM and VCF file, allowing you to perform a test run to ensure the pipeline is configured correctly.
+
+You can run the test using the following command from the root of the repository. **Remember to replace `/path/to/your/GRCh38.d1.vd1.fa`** with the actual path to your reference genome file.
 
 ```bash
-bash mobsnvf-workflow.sh --use-phi 'true' --sample-id {your-sample-name} 
+bash mobsnvf-workflow.sh \
+    --bam-path "example-data/bam/TCGA-A6-6650-01B-02D-A270-10_Illumina_gdc_realn_compressed.bam" \
+    --vcf-path "example-data/vcf/a82846b3-c3df-443e-b9e6-836380fa60e3.vcf.gz" \
+    --ref-path "example-data/vcf/tp53_hg38.fasta" \
 ```
 
-The `--sample-id` field takes the sample name of the __BAM__ and __VCF__ files. For example, the `--sample-id` input for __`sample01.bam`__ and __`sample01.vcf`__ would be `--sample-id sample01`.
+Upon successful completion, you will find the results in the `example-output/TCGA-A6-6650-test/known_phi/` directory.
 
-#### Phi
-The parameter __phi__ is an estimate of the extent of artificial DNA damage. 
+### Phi Parameter
 
-Setting the `--use-phi` flag to `true` will estimate phi with `hts-mobsnvf quantify` and use it in when identifying artifacts with `hts-mobsnvf identify`. 
+The parameter **phi** is an estimate of the extent of artificial DNA damage.
 
-When `--use-phi` is set to `false`, phi estimation will be skipped and `hts-mobsnvf identify` will estimate the extent of DNA damage (phi) individually for each SNV site.
+Setting the `--use-phi` flag to `true` (the default) will estimate phi with `hts-mobsnvf quantify` and use this single value when identifying artifacts across all sites with `hts-mobsnvf identify`. This is the recommended approach as it generally improves accuracy.
 
-Typically, accuracy is bit better if phi is estimated using `quantify` first, and then provided to `identify`. Hence, it is generally recommended to set `--use-phi` to **true**.
+When `--use-phi` is set to `false`, the initial phi estimation step is skipped, and `hts-mobsnvf identify` will instead estimate the extent of DNA damage (phi) individually for each SNV site.
 
-#### Results
+### Results
 
-The result for this workflow will be saved to the `results/` directory, followed by the __sample name__ and __phi__. Example `./results/sample01/known_phi/`.
+The results for the workflow will be saved to the directory specified by `--out-dir`, organized by sample ID and whether phi was used. For example: `/path/to/output/sample01/known_phi/`.
 
-The outputs files are:
+The primary output files are:
 
-- `{sample_name}_ffpe.snv` : This contains the list of SNVs with their P-value.
-- `{sample_name}_selected.vcf` : This contains the genetic variants with FFPE Artifacts filtered out.
-- `{sample_name}_selected.vcf.idx` : Index of the `{sample_name}_selected.vcf`.
-- `{sample_name}_removed.vcf` : This contains the genetic variants which are presumably FFPE artifacts.
-- `{sample_name}_removed.vcf.idx` : Index of the `{sample_name}_removed.vcf`.
+*   **`{sample_id}_{damage_type}.snv`**: A tab-separated file containing all SNVs annotated by `hts-mobsnvf identify`.
+*   **`{sample_id}_artifacts.vcf`**: A VCF file containing the variants that were identified as artifacts.
+*   **`{sample_id}_artifacts.vcf.idx`**: The index for the artifacts VCF.
+*   **`{sample_id}_filtered.vcf`**: The final, filtered VCF file with artifacts removed. **This is the main result file.**
+*   **`{sample_id}_filtered.vcf.idx`**: The index for the final filtered VCF.
+*   **`{sample_id}.log`**: A log file containing the complete standard output of the workflow run.
+*   **`{damage_type}_obquant.json`**: (Only if `--use-phi` is `true`) A JSON file containing the estimated phi value.
 
 ## Running multiple samples
 
-An easy way to run multiple samples using this workflow is to use __Dlazy__. Check __[djhshih/dlazy](https://github.com/djhshih/dlazy)__ for instructions on installation and basic use.
+To process multiple samples, we recommend creating a manifest file and looping through it.
 
-You may use dlazy to run your samples in as follows:
+1.  **Create a manifest file**
 
-- Run the `list_samples.py` script to obtain a list of your samples:
+    Create a tab-separated values (TSV) file (e.g., `samples.tsv`) with columns for the sample ID and the absolute paths to the corresponding BAM and VCF files.
 
-```bash
-python list_samples.py
-```
-This will generate a `samples.txt` file with listing the sample name of all your samples by referring to the _`bam/`_ directory. 
+    **Example `samples.tsv`:**
 
-Then the pipeline can be run using:
-```
-djobs ./mobsnvf-workflow.sh --use-phi 'true' --sample-id
-dlazy job
-```
+    ```tsv
+    	/path/to/bams/sample01.bam	/path/to/vcfs/sample01.vcf.gz
+    	/path/to/bams/sample02.bam	/path/to/vcfs/sample02.vcf.gz
+    	/path/to/bams/sample03.bam	/path/to/vcfs/sample03.vcf.gz
+    ```
 
-### Dealing with prefixes and suffixes
+2.  **Run the workflow using a loop**
 
-If your bam file name includes suffixes or prefixes along with the sample name, they may be declared using the `--suffix` and `--prefix` arguments to omit them when generating the sample list.
+    You can now use a simple `bash` loop to read the manifest file and execute the workflow for each sample.
 
-#### Example
-Imagine you have a bam file named `prefix_sample_01_suffix.bam` and a vcf file named `prefix_sample_01_suffix.vcf`. 
+    ```bash
+    #!/bin/bash
+    
+    ref="/path/to/your/hg38.fasta"
+    out="/path/to/your/results"
+    
+    mkdir -p job
 
-As the sample list is generated based on the bam files present in the `bam/` directory, the prefix and suffix can be omitted during sample list generation using __`--suffix _suffix --prefix prefix_`__ to just keep the sample name i.e. __sample_01__:
-
- ```bash
-python list_samples.py --suffix _suffix --prefix prefix_
- ```
-
-Then the pipeline with multiple samples can be run with **Dlazy** using:
-
-```
-djobs ./mobsnvf-workflow.sh --use-phi 'true' --prefix-bam prefix_ --prefix-vcf prefix_ --suffix-bam _suffix --suffix-vcf _suffix --sample-id
-
-dlazy job
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    # Read the manifest and generate a command for each sample
+    while IFS=$'\t' read -r  bam_path vcf_path; do
+      # Skip header or empty lines
+      [[ "$bam_path" == "bam_path" || -z "$bam_path" ]] && continue
+    
+      echo "bash mobsnvf-workflow.sh \
+        --bam-path \"${bam_path}\" \
+        --vcf-path \"${vcf_path}\" \
+        --ref-path \"${ref}\" \
+        --out-dir \"${out}\"" > "job/$(basename "${vcf_path%%.*}").sh"
+    done < samples.tsv
+    
+    ```
