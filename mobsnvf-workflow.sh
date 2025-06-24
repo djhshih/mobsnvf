@@ -16,8 +16,6 @@ ref_path=""
 bam_path=""
 vcf_path=""
 
-
-
 # Process command-line arguments for phi and sample id
 while [[ "$#" -gt 0 ]]; do
     case $1 in
@@ -41,8 +39,12 @@ while [[ "$#" -gt 0 ]]; do
             use_phi="$2"
             shift 2
             ;;
-        --use-phi)
+        -p|--p|--use-phi)
             use_phi="$2"
+            shift 2
+            ;;
+        -c|--c|--cut|--fp-cut)
+            fp_cut="$2"
             shift 2
             ;;
         --damage-type|--dt|-d)
@@ -327,9 +329,9 @@ if [[ "$use_phi" == "true" ]]; then
 fi
 echo -e "${n}) annotated_snv       = ${annotated_snv}"
 ((n++))
-echo -e "${n}) artifacts_vcf         = ${artifacts_vcf}"
+echo -e "${n}) artifacts_vcf       = ${artifacts_vcf}"
 ((n++))
-echo -e "${n}) artifacts_vcf_index   = ${artifacts_vcf_index}"
+echo -e "${n}) artifacts_vcf_index = ${artifacts_vcf_index}"
 ((n++))
 echo -e "${n}) filtered_vcf        = ${filtered_vcf}"
 ((n++))
