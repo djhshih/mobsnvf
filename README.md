@@ -98,7 +98,7 @@ The workflow requires explicit file paths for inputs.
 
 Below is a typical command to run the pipeline for a single sample. You must provide the paths to your BAM, VCF, and reference genome.
 
-**Note:** It is important that the reference fasta provided is the same reference which was used to generate the BAM file. 
+**Note:** It is important that the reference fasta provided is the same as the one used for sequence alignment. 
 
 ```bash
 bash mobsnvf-workflow.sh \
@@ -110,6 +110,17 @@ bash mobsnvf-workflow.sh \
     --use-phi "true" \
     --out-dir "/path/to/output"
 ```
+
+A more barebones command without optional parameters would look like this:
+
+```bash
+bash mobsnvf-workflow.sh \
+    --bam-path "/path/to/data/bams/sample01.bam" \
+    --vcf-path "/path/to/data/vcfs/sample01.vcf.gz" \
+    --ref-path "/path/to/genomes/bam.specific.fasta"
+```
+
+In this case the sample id will be inferred from the VCF filename, and the output will be saved to `./result/<sample_id>/known_phi/`.
 
 ### Reference Genome
 
@@ -124,7 +135,7 @@ bash get.sh
 
 ### Testing the Pipeline with Example Data
 
-This repository includes an `example-data` directory containing a sample BAM and VCF file, allowing you to perform a test run to ensure the pipeline is configured correctly.
+This repository includes an `example-data` directory containing a simple ffpe BAM and VCF file along with a matched normal, allowing you to perform a test run to ensure the pipeline is configured correctly.
 
 You can run the test using the following command from the root of the repository. **Remember to replace `/path/to/your/GRCh38.d1.vd1.fa`** with the actual path to your reference genome file.
 
@@ -132,7 +143,7 @@ You can run the test using the following command from the root of the repository
 bash mobsnvf-workflow.sh \
     --bam-path "example-data/bam/TCGA-A6-6650-01B-02D-A270-10_Illumina_gdc_realn_compressed.bam" \
     --vcf-path "example-data/vcf/a82846b3-c3df-443e-b9e6-836380fa60e3.vcf.gz" \
-    --ref-path "example-data/vcf/tp53_hg38.fasta" \
+    --ref-path "example-data/vcf/tp53_hg38.fasta"
 ```
 
 Upon successful completion, you will find the results in the `example-output/TCGA-A6-6650-test/known_phi/` directory.
@@ -170,14 +181,14 @@ To process multiple samples, we recommend creating a manifest file and looping t
     **Example `samples.tsv`:**
 
     ```tsv
-    	/path/to/bams/sample01.bam	/path/to/vcfs/sample01.vcf.gz
-    	/path/to/bams/sample02.bam	/path/to/vcfs/sample02.vcf.gz
-    	/path/to/bams/sample03.bam	/path/to/vcfs/sample03.vcf.gz
+    /path/to/bams/sample01.bam	/path/to/vcfs/sample01.vcf.gz
+    /path/to/bams/sample02.bam	/path/to/vcfs/sample02.vcf.gz
+    /path/to/bams/sample03.bam	/path/to/vcfs/sample03.vcf.gz
     ```
 
 2.  **Run the workflow using a loop**
 
-    You can now use a simple `bash` loop to read the manifest file and execute the workflow for each sample.
+    You can now use a simple `bash` loop to read the manifest file and create a script for each sample. Then you may run these scripts in batch mode.
 
     ```bash
     #!/bin/bash
@@ -199,4 +210,10 @@ To process multiple samples, we recommend creating a manifest file and looping t
         --out-dir \"${out}\"" > "job/$(basename "${vcf_path%%.*}").sh"
     done < samples.tsv
     
+    ```
+
+    These scripts can then be executed in batch, for example using [dlazy](https://github.com/djhshih/dlazy/tree/main).
+
+    ```bash
+    dlazy job
     ```
