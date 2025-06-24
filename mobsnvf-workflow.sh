@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -eo pipefail
+set -euo pipefail
 
 ## User-provided inputs | Change as necessary
 sample_id=""
@@ -56,15 +56,8 @@ while [[ "$#" -gt 0 ]]; do
     esac
 done
 
-# Verify that required parameters are provided
-if [[ -z "$sample_id" ]]; then
-    echo "Error: sample_id is required. Use --i <sample_id>"
-    exit 1
-fi
 
-echo -e "Using Parameters:"
-echo -e "Sample ID: $sample_id"
-echo -e "Use phi: $use_phi\n"
+
 
 ## Set up directories
 #### Don't use absolute paths
@@ -75,14 +68,6 @@ if [[ -z "$out_dir" ]]; then
   out_dir="${base_dir}/result"
 fi
 
-if [[ "$use_phi" == "true" ]]; then
-  out_dir="${out_dir}/${sample_id}/known_phi"
-else
-  out_dir="${out_dir}/${sample_id}/unknown_phi"
-fi
-
-mkdir -p "${out_dir}"
-
 ## Assign bam
 if [[ -z "$bam_path" ]]; then
   echo "BAM file is required for mobsnvf"
@@ -91,6 +76,12 @@ elif [[ "$bam_path" == *"/"* ]]; then
   bam="$bam_path"
 else
   bam="${base_dir}/bam/${sample_id}.bam"
+fi
+
+## Check if BAM file exists
+if [[ ! -f "$bam" ]]; then
+  echo "$bam does not exist"
+  exit 1
 fi
 
 ## Check and assign bam index
@@ -114,8 +105,14 @@ else
   vcf="${base_dir}/vcf/${vcf_path}"
 fi
 
+## Check if vcf exists
+if [[ ! -f "$vcf" ]]; then
+  echo "$vcf does not exist"
+  exit 1
+fi
+
 ## Check and assign vcf index
-if [[ "$vcf" =~ \.vcf\.gz || "$vcf" =~ \.bcf ]]; then
+if [[ "$vcf" =~ \.vcf\.gz$ || "$vcf" =~ \.bcf$ ]]; then
   idx_tbi=${vcf}.tbi
   idx_csi=${vcf}.csi
 fi
@@ -125,7 +122,8 @@ if [[ -f $idx_tbi ]]; then
 elif [[ -f "$idx_csi" ]]; then
   vcf_idx="$idx_csi"
 else
-  echo "$VCF is not indexed. Please index your vcf to proceed"
+  echo "$vcf is is compressed but not indexed. Please index your vcf to proceed"
+  echo -e "Example: \n bcftools index -t $vcf"
   exit 1
 fi
 
@@ -142,7 +140,7 @@ fi
 ## Assign Sample ID
 if [[ -z "$sample_id" ]]; then
   sample_id="${vcf}"
-  if [[ $vcf =~ \.vcf\.gz ]]; then
+  if [[ $vcf =~ \.vcf\.gz$ ]]; then
     sample_id="${sample_id%.*}"
   fi
   sample_id=$(basename "${sample_id%.*}")
@@ -158,6 +156,9 @@ fi
 
 mkdir -p "${out_dir}"
 
+echo -e "Using Parameters:"
+echo -e "Sample ID: $sample_id"
+echo -e "Use phi: $use_phi\n"
 
 rscript="${base_dir}/R/fdr-failed.R"
 
@@ -180,9 +181,9 @@ if [[ "$use_phi" == "true" ]]; then
     -t "${damage_type}" \
     -f "${ref}" \
     -b "${bam}" \
-    -J "${out_dir}${damage_type}_obquant.json"
+    -J "${out_dir}/${damage_type}_obquant.json"
 
-  phi_json="${out_dir}${damage_type}_obquant.json"
+  phi_json="${out_dir}/${damage_type}_obquant.json"
   echo -e "phi_json created at: ${phi_json}\n"
 else
   echo -e "==== 1) Continuing without phi estimation ===="
@@ -217,10 +218,10 @@ hts-mobsnvf identify \
   -V "${vcf}" \
   -g 0 \
   ${phi_opts} \
-  -o "${out_dir}${sample_id}_${damage_type}.snv" \
-  > "${out_dir}${sample_id}_snv_${damage_type}_mobsnvf.tsv"
+  -o "${out_dir}/${sample_id}_${damage_type}.snv" \
+  > "${out_dir}/${sample_id}_snv_${damage_type}_mobsnvf.tsv"
 
-annotated_snv="${out_dir}${sample_id}_${damage_type}.snv"
+annotated_snv="${out_dir}/${sample_id}_${damage_type}.snv"
 echo -e "Annotated SNV file: ${annotated_snv}\n"
 
 
@@ -229,23 +230,29 @@ echo -e "==== 3) FDR filter on SNVs using R script ===="
 # Applies an FDR-based filter to the SNV file.
 Rscript "${rscript}" \
   "${annotated_snv}" \
-  -o "${out_dir}${sample_id}_failed.snv" \
+  -o "${out_dir}/${sample_id}_failed.snv" \
   --fp-cut "${fp_cut}"
 
-failed_snv="${out_dir}${sample_id}_failed.snv"
+failed_snv="${out_dir}/${sample_id}_failed.snv"
 echo -e "Failed SNV file: ${failed_snv}\n"
 
 
 ## 4) Task: vcf_to_header
 echo -e "==== 4) Extracting the header from the original VCF ===="
-grep '^#' "${vcf}" | sed 's/INFO\t.*/INFO/' > "${out_dir}${sample_id}.vcf.header"
-vcf_header="${out_dir}${sample_id}.vcf.header"
-echo -e "Header file: ${vcf_header}\n"
+if [[ $vcf =~ \.vcf\.gz$ ]]; then
+  zcat "${vcf}" | grep '^#' | sed 's/INFO\t.*/INFO/' > "${out_dir}/${sample_id}.vcf.header"
+elif [[ $vcf =~ \.bcf$ ]]; then
+  bcftools view -h "${vcf}" | sed 's/INFO\t.*/INFO/' > "${out_dir}/${sample_id}.vcf.header"
+else
+  grep '^#' "${vcf}" | sed 's/INFO\t.*/INFO/' > "${out_dir}/${sample_id}.vcf.header"
+fi
 
+vcf_header="${out_dir}/${sample_id}.vcf.header"
+echo -e "Header file: ${vcf_header}\n"
 
 ## 5) Task: snv_to_vcf
 echo -e "==== 5) Converting SNVs to VCF ===="
-out_name="${out_dir}${sample_id}_removed"
+out_name="${out_dir}/${sample_id}_artifacts"
 cat "${vcf_header}" > "${out_name}.vcf"
 
 # Create a new VCF by combining info from the SNV data.
@@ -258,44 +265,46 @@ gatk IndexFeatureFile \
   -I "${out_name}.vcf" \
   -O "${out_name}.vcf.idx"
 
-removed_vcf="${out_name}.vcf"
-removed_vcf_index="${out_name}.vcf.idx"
-echo -e "Mask VCF (failed SNVs): ${removed_vcf}"
-echo -e "Mask VCF index: ${removed_vcf_index}\n"
+artifacts_vcf="${out_name}.vcf"
+artifacts_vcf_index="${out_name}.vcf.idx"
+echo -e "Mask VCF (failed SNVs): ${artifacts_vcf}"
+echo -e "Mask VCF index: ${artifacts_vcf_index}\n"
 
 
 ## 6) Task: vcf_mask_variants
 echo -e "==== 6) Masking variants in the original VCF ===="
-# Apply the mask 'removed_vcf' to the original VCF to identify differences in varaints
+# Apply the mask 'artifacts_vcf' to the original VCF to identify differences in varaints
 gatk VariantFiltration \
   -V "${vcf}" \
   --invalidate-previous-filters false \
-  --mask "${removed_vcf}" \
+  --mask "${artifacts_vcf}" \
   --mask-name "${damage_type}" \
-  -O "${out_dir}${sample_id}_masked.vcf"
+  -O "${out_dir}/${sample_id}_masked.vcf"
 
-masked_vcf="${out_dir}${sample_id}_masked.vcf"
-masked_vcf_index="${out_dir}${sample_id}_masked.vcf.idx"
+masked_vcf="${out_dir}/${sample_id}_masked.vcf"
+masked_vcf_index="${out_dir}/${sample_id}_masked.vcf.idx"
 echo -e "Masked VCF: ${masked_vcf}"
 echo -e "Masked VCF index: ${masked_vcf_index}\n"
 
 
 ## 7) Task: vcf_select_variants
 echo -e "==== 7) Selecting unfiltered variants ===="
+
+filtered_vcf="${out_dir}/${sample_id}_filtered.vcf"
+filtered_vcf_index="${out_dir}/${sample_id}_filtered.vcf.idx"
+
 gatk SelectVariants \
   -V "${masked_vcf}" \
   --exclude-filtered \
-  -O "${out_dir}${sample_id}_selected.vcf"
+  -O "${filtered_vcf}"
 
-selected_vcf="${out_dir}${sample_id}_selected.vcf"
-selected_vcf_index="${out_dir}${sample_id}_selected.vcf.idx"
 
 gatk IndexFeatureFile \
-  -I "${selected_vcf}" \
-  -O "${selected_vcf_index}"
+  -I "${filtered_vcf}" \
+  -O "${filtered_vcf_index}"
 
-echo -e "Selected VCF (final): ${selected_vcf}"
-echo -e "Selected VCF index (final): ${selected_vcf_index}\n"
+echo -e "Selected VCF (final): ${filtered_vcf}"
+echo -e "Selected VCF index (final): ${filtered_vcf_index}\n"
 
 
 ## Remove Intermediate files
@@ -303,19 +312,28 @@ echo -e "Selected VCF index (final): ${selected_vcf_index}\n"
 rm "${vcf_header}"
 rm "${masked_vcf}"
 rm "${masked_vcf_index}"
-rm "${out_dir}${sample_id}_snv_${damage_type}_mobsnvf.tsv"
+rm "${out_dir}/${sample_id}_snv_${damage_type}_mobsnvf.tsv"
 
 
 ## Final output summary
 echo -e "-------------------"
 echo -e "Filtering completed!"
 echo -e "Outputs:"
-echo -e "1) phi_json            = ${phi_json}"
-echo -e "2) annotated_snv       = ${annotated_snv}"
-echo -e "3) removed_vcf         = ${removed_vcf}"
-echo -e "4) removed_vcf_index   = ${removed_vcf_index}"
-echo -e "5) selected_vcf        = ${selected_vcf}"
-echo -e "6) selected_vcf_index  = ${selected_vcf_index}"
+
+n=1
+if [[ "$use_phi" == "true" ]]; then
+  echo -e "${n}) phi_json            = ${phi_json}"
+  ((n++))
+fi
+echo -e "${n}) annotated_snv       = ${annotated_snv}"
+((n++))
+echo -e "${n}) artifacts_vcf         = ${artifacts_vcf}"
+((n++))
+echo -e "${n}) artifacts_vcf_index   = ${artifacts_vcf_index}"
+((n++))
+echo -e "${n}) selected_vcf        = ${filtered_vcf}"
+((n++))
+echo -e "${n}) selected_vcf_index  = ${filtered_vcf_index}"
 
 ## Log the output
-) 2>&1 | tee "${out_dir}${sample_id}.log"
+) 2>&1 | tee "${out_dir}/${sample_id}.log"
