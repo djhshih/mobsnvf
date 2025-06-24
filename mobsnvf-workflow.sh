@@ -35,11 +35,11 @@ while [[ "$#" -gt 0 ]]; do
             ref_path="$2"
             shift 2
             ;;
-        -o|--o|-out|--out-dir)
-            use_phi="$2"
+        -o|--o|--out|--out-dir)
+            out_dir="$2"
             shift 2
             ;;
-        -p|--p|--use-phi)
+        -p|--p|--use-phi) 
             use_phi="$2"
             shift 2
             ;;
@@ -47,7 +47,7 @@ while [[ "$#" -gt 0 ]]; do
             fp_cut="$2"
             shift 2
             ;;
-        --damage-type|--dt|-d)
+        -d|--dt|--damage|--damage-type)
             damage_type="$2"
             shift 2
             ;;
@@ -58,12 +58,10 @@ while [[ "$#" -gt 0 ]]; do
     esac
 done
 
-
-
-
 ## Set up directories
 #### Don't use absolute paths
 base_dir="."
+out_dir="${out_dir%/}"
 
 ## Assign outdir
 if [[ -z "$out_dir" ]]; then
