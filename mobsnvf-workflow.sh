@@ -5,15 +5,18 @@ set -eo pipefail
 ## User-provided inputs | Change as necessary
 sample_id=""
 damage_type="ffpe"
-fp_cut="1e-08"
+fp_cut="0.5"
 use_phi="true"
 
-## Prefix and suffix for VCF and BAM files
-pvcf=""
-svcf=""
-pbam=""
-sbam=""
-ref_name="Homo_sapiens_assembly38.fasta"
+## File paths
+
+base_dir="."
+out_dir=""
+ref_path=""
+bam_path=""
+vcf_path=""
+
+
 
 # Process command-line arguments for phi and sample id
 while [[ "$#" -gt 0 ]]; do
@@ -22,32 +25,28 @@ while [[ "$#" -gt 0 ]]; do
             sample_id="$2"
             shift 2
             ;;
+        -b|--b|--bam|--bam-path)
+            bam_path="$2"
+            shift 2
+            ;;
+        -v|--v|--vcf|--vcf-path)
+            vcf_path="$2"
+            shift 2
+            ;;
+        -r|--r|--ref|--ref-path|--reference-genome-path)
+            ref_path="$2"
+            shift 2
+            ;;
+        -o|--o|-out|--out-dir)
+            use_phi="$2"
+            shift 2
+            ;;
         --use-phi)
             use_phi="$2"
             shift 2
             ;;
-        --prefix-vcf|--pvcf|-pv)
-            pvcf="$2"
-            shift 2
-            ;;
-        --suffix-vcf|--svcf|-sv)
-            svcf="$2"
-            shift 2
-            ;;
-        --prefix-bam|--pbam|-pb)
-            pbam="$2"
-            shift 2
-            ;;
-        --suffix-bam|--sbam|-sb)
-            sbam="$2"
-            shift 2
-            ;;
         --damage-type|--dt|-d)
             damage_type="$2"
-            shift 2
-            ;;
-        --reference-genome|--ref|-r)
-            ref_name="$2"
             shift 2
             ;;
         *)
@@ -71,17 +70,95 @@ echo -e "Use phi: $use_phi\n"
 #### Don't use absolute paths
 base_dir="."
 
-if [[ "$use_phi" == "true" ]]; then
-  out_dir="${base_dir}/results/${sample_id}/known_phi/"
-else
-  out_dir="${base_dir}/results/${sample_id}/unknown_phi/"
+## Assign outdir
+if [[ -z "$out_dir" ]]; then
+  out_dir="${base_dir}/result"
 fi
+
+if [[ "$use_phi" == "true" ]]; then
+  out_dir="${out_dir}/${sample_id}/known_phi"
+else
+  out_dir="${out_dir}/${sample_id}/unknown_phi"
+fi
+
 mkdir -p "${out_dir}"
 
-bam="${base_dir}/bam/${pbam}${sample_id}${sbam}.bam"
-bai="${base_dir}/bam/${pbam}${sample_id}${sbam}.bai"
-ref="${base_dir}/ref/${ref_name}"
-vcf="${base_dir}/vcf/${pvcf}${sample_id}${svcf}.vcf"
+## Assign bam
+if [[ -z "$bam_path" ]]; then
+  echo "BAM file is required for mobsnvf"
+  exit 1
+elif [[ "$bam_path" == *"/"* ]]; then
+  bam="$bam_path"
+else
+  bam="${base_dir}/bam/${sample_id}.bam"
+fi
+
+## Check and assign bam index
+if [[ -f "${bam%.*}.bai" ]]; then
+  bai="${bam%.*}.bai"
+elif [[ -f "${bam}.bai" ]]; then
+  bai="${bam}.bai"
+else
+  echo "$bam is not indexed. Please index the bam file"
+  echo -e "Example: \n samtools index $bam"
+  exit 1
+fi
+
+## Assign vcf
+if [[ -z "$vcf_path" ]]; then
+  echo "VCF file is required for mobsnvf"
+  exit 1
+elif [[ "$vcf_path" == *"/"* ]]; then
+  vcf="$vcf_path"
+else
+  vcf="${base_dir}/vcf/${vcf_path}"
+fi
+
+## Check and assign vcf index
+if [[ "$vcf" =~ \.vcf\.gz || "$vcf" =~ \.bcf ]]; then
+  idx_tbi=${vcf}.tbi
+  idx_csi=${vcf}.csi
+fi
+
+if [[ -f $idx_tbi ]]; then
+  vcf_idx="$idx_tbi"
+elif [[ -f "$idx_csi" ]]; then
+  vcf_idx="$idx_csi"
+else
+  echo "$VCF is not indexed. Please index your vcf to proceed"
+  exit 1
+fi
+
+# Assign reference genome
+if [[ -z "$ref_path" ]]; then
+  echo "Reference genome path is required for mobsnvf"
+  exit 1
+elif [[ "$ref_path" == *"/"* ]]; then
+  ref="$ref_path"
+else
+  ref="${base_dir}/ref/${ref_path}"
+fi
+
+## Assign Sample ID
+if [[ -z "$sample_id" ]]; then
+  sample_id="${vcf}"
+  if [[ $vcf =~ \.vcf\.gz ]]; then
+    sample_id="${sample_id%.*}"
+  fi
+  sample_id=$(basename "${sample_id%.*}")
+
+fi
+
+## Assign final out path based on the sample ID and if Phi is used or not
+if [[ "$use_phi" == "true" ]]; then
+  out_dir="${out_dir}/${sample_id}/known_phi"
+else
+  out_dir="${out_dir}/${sample_id}/unknown_phi"
+fi
+
+mkdir -p "${out_dir}"
+
+
 rscript="${base_dir}/R/fdr-failed.R"
 
 (
@@ -91,7 +168,7 @@ echo -e "2) BAM           = ${bam}"
 echo -e "3) BAM_Index     = ${bai}"
 echo -e "4) REF           = ${ref}"
 echo -e "5) VCF           = ${vcf}"
-echo -e "6) VCF_index     = ${vcf}.idx\n\n"
+echo -e "6) VCF_index     = ${vcf_idx}\n\n"
 
 
 ## 1) Task: bam_phi_estimation
@@ -212,6 +289,10 @@ gatk SelectVariants \
 
 selected_vcf="${out_dir}${sample_id}_selected.vcf"
 selected_vcf_index="${out_dir}${sample_id}_selected.vcf.idx"
+
+gatk IndexFeatureFile \
+  -I "${selected_vcf}" \
+  -O "${selected_vcf_index}"
 
 echo -e "Selected VCF (final): ${selected_vcf}"
 echo -e "Selected VCF index (final): ${selected_vcf_index}\n"
