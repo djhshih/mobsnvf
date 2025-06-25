@@ -167,9 +167,9 @@ You can run the test using the following command from the root of the repository
 
 ```bash
 bash mobsnvf-workflow.sh \
-    --bam-path "example-data/bam/TCGA-A6-6650-01B-02D-A270-10_Illumina_gdc_realn_compressed.bam" \
-    --vcf-path "example-data/vcf/a82846b3-c3df-443e-b9e6-836380fa60e3.vcf.gz" \
-    --ref-path "example-data/vcf/tp53_hg38.fasta"
+    --ref example-data/ref/tp53_hg38.fasta \
+    --bam example-data/bam/ffpe.bam \
+    --vcf example-data/vcf/ffpe.calls.vcf.gz./
 ```
 
 Upon successful completion, you will find the results in the `example-output/TCGA-A6-6650-test/known_phi/` directory.
@@ -219,8 +219,8 @@ To process multiple samples, we recommend creating a manifest file and looping t
     ```bash
     #!/bin/bash
     
-    ref="/path/to/your/hg38.fasta"
-    out="/path/to/your/results"
+    ref="/path/to/your/reference.fasta"
+    out="/path/to/your/output/results"
     
     mkdir -p job
 
@@ -253,7 +253,7 @@ An evaluation python script is included with this repository to analyse the muta
 To run the evaluation script, you can use the following command:
 
 ```bash
-python3 evaluate.py \
+python evaluate.py \
     --var-path "/path/to/your/variants.vcf" \
     --ref-path "/path/to/your/reference.fasta" \
     --outdir "/path/to/your/output" \
@@ -263,9 +263,9 @@ python3 evaluate.py \
 Usage using example data:
 
 ```bash
-    python evaluate.py \
-        -r example-data/ref/tp53_hg38.fasta \
-        -v result/ffpe.calls/known_phi/ffpe.calls_filtered.vcf
+python evaluate.py \
+    -r example-data/ref/tp53_hg38.fasta \
+    -v result/ffpe.calls/known_phi/ffpe.calls_filtered.vcf
 ```
 
 By default, the output sample id will be inferred from the VCF filename, and the results will be saved to the same directory as the input VCF file.
