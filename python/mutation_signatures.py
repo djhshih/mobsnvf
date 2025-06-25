@@ -14,6 +14,7 @@ Functions:
 Dependencies:
 	- polars
 	- pysam
+	- numpy
 	- seaborn
 	- matplotlib
 

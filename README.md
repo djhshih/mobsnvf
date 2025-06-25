@@ -9,21 +9,32 @@ This repository provides a pipeline for using the mobsnvf module of htspan for a
 
 ## Dependencies
 
-*   R >= 4.0
-*   GATK >= 4.2.2.0
-*   gsutil >= 5.00
-*   bzip2 >= 1.0 (for htslib)
-*   cmake
-*   gcc >= 4.8
-*   g++
-*   libbz2-dev
-*   libcurl-dev >= 7.64 (for htslib, any implementation)
-*   liblzma-dev >= 5.2.4 (for htslib)
+*   htspan (see **[djhshih/htspan](https://github.com/djhshih/setup-linux)** for instructions on setting up htspan)
+*   R 4.4.3
+*   Python 3.12.10
+*   GATK 4.2.2.0
+*   bzip2 1.0 (for htslib)
+*   libcurl-dev 7.64 (for htslib, any implementation)
+*   liblzma-dev 5.2.4 (for htslib)
 *   zlib1g-dev
+*   libbz2-dev
+*   cmake
+*   g++
+*   gcc
 
 ### R libraries:
 *   `stringr`
 *   `argparser`
+
+### Python libraries:
+*   polars
+*   pysam
+*   numpy
+*   seaborn
+*   matplotlib
+
+### Optional dependencies:
+*   gsutil
 
 ## Setup Procedure
 
@@ -33,9 +44,9 @@ If your system does git installed, please setup and configure git first. You may
 sudo apt install git
 ```
 
-### Compile htspan
+### Install htspan
 
-Please refer to **[djhshih/htspan]** for instructions on setting up **htspan** and for an example of a minimalistic workflow.
+Please refer to **[djhshih/htspan](https://github.com/djhshih/htspan)** for instructions on setting up **htspan** and a minimalistic use case.
 
 ### Clone mobsnvf repo
 
