@@ -210,7 +210,8 @@ The primary output files are:
 *   **`{sample_id}.log`**: A log file containing the complete standard output of the workflow run.
 *   **`{damage_type}_obquant.json`**: (Only if `--use-phi` is `true`) A JSON file containing the estimated phi value.
 
-## Running multiple samples
+
+### Running multiple samples
 
 To process multiple samples, we recommend creating a manifest file and looping through it.
 
@@ -293,3 +294,4 @@ Running the evaluation script will generate the following files in the specified
 -  **`{your_sample_name}_96c_mutations_profiles.tsv`**: A tab-separated file containing the mutation profile.
 -  **`{your_sample_name}_96c_mutations_count.tsv`**: A tab-separated file containing the mutation counts.
 -  **`{your_sample_name}_96c_mutations_signature.pdf`**: A PDF showing the 96 channel mutation signature plot along with total variant count and total C>T mutation count.
+
