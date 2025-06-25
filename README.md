@@ -227,7 +227,7 @@ To process multiple samples, we recommend creating a manifest file and looping t
     /path/to/bams/sample03.bam	/path/to/vcfs/sample03.vcf.gz
     ```
 
-2.  **Run the workflow using a loop**
+2.  **Run the workflow in batch**
 
     You can now use a simple `bash` loop to read the manifest file and create a script for each sample. Then you may run these scripts in batch mode.
 
