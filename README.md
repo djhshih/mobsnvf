@@ -175,9 +175,9 @@ bash get.sh
 
 ### Testing the Pipeline with Example Data
 
-This repository includes an `example-data` directory containing a simple ffpe BAM and VCF file along with a matched normal, allowing you to perform a test run to ensure the pipeline is configured correctly.
+This repository includes an `example-data` directory containing a simple ffpe BAM and VCF file along with a matched normal VCF. This allows you to perform a test run to ensure that your environment is configured correctly and the pipeline works as expected.
 
-You can run the test using the following command from the root of the repository. **Remember to replace `/path/to/your/GRCh38.d1.vd1.fa`** with the actual path to your reference genome file.
+You can run the test using the following command from the root of the repository.
 
 ```bash
 bash mobsnvf-workflow.sh \
@@ -209,7 +209,6 @@ The primary output files are:
 *   **`{sample_id}_filtered.vcf.idx`**: The index for the final filtered VCF.
 *   **`{sample_id}.log`**: A log file containing the complete standard output of the workflow run.
 *   **`{damage_type}_obquant.json`**: (Only if `--use-phi` is `true`) A JSON file containing the estimated phi value.
-
 
 ### Running multiple samples
 
