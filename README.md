@@ -103,7 +103,7 @@ This will create and run an interactive Docker container, mounting the current d
 
 ## How to use this pipeline
 
-The workflow requires explicit file paths for inputs.
+
 
 ### Command-Line Arguments
 
@@ -113,16 +113,18 @@ The workflow requires explicit file paths for inputs.
 | `--vcf-path` | `-v`, `--vcf` | **Yes** | | Path to the input VCF file. Must be indexed (`.tbi` or `.csi` if gzipped). |
 | `--ref-path` | `-r`, `--ref` | **Yes** | | Path to the reference genome FASTA file. Must be indexed (`.fai`). |
 | `--sample-id` | `-i`, `--id` | No | Inferred from VCF | A unique identifier for the sample. If not provided, it will be automatically derived from the VCF filename. |
-| `--use-phi` | | No | `true` | Set to `true` to perform phi estimation or `false` to skip it. |
+| `--use-phi` | `-p` | No | `true` | Set to `true` to perform phi estimation or `false` to skip it. |
 | `--damage-type`| `-d`, `--damage` | No | `ffpe` | The type of DNA damage to model. Supported values are `ffpe` and `oxog`. |
 | `--out-dir` | `-o`, `--out` | No | `./result` | The base directory where results will be saved. |
-| `--fp-cut` | | No | `0.5` | False positive cutoff value for the FDR filter step. |
+| `--fp-cut` | `-c`, `--cut` | No | `0.5` | False positive cutoff value for the FDR filter step. |
 
 ### Example Usage
 
 Below is a typical command to run the pipeline for a single sample. You must provide the paths to your BAM, VCF, and reference genome.
 
-**Note:** It is important that the reference fasta provided is the same as the one used for sequence alignment. 
+The workflow requires explicit file paths for inputs unless they are placed in the `ref`, `bam` and `vcf` directories within the repository. In this case they can be just referred to by their filenames. The input files i.e. the BAM, VCF and Reference Fenome must be indexed.
+
+**Note:** It is important that the Reference Fasta provided is the same as the one used for sequence alignment.
 
 ```bash
 bash mobsnvf-workflow.sh \
