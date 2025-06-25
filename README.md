@@ -10,7 +10,7 @@ This repository provides a pipeline for using the mobsnvf module of htspan for a
 ## Dependencies
 
 *   htspan (see **[djhshih/htspan](https://github.com/djhshih/setup-linux)** for instructions on setting up htspan)
-*   R v4.4.3
+*   R 4.4.3
 *   Python 3.12.10
 *   GATK 4.6.2.0
 *   libcurl-dev 8.14.1
