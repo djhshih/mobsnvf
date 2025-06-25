@@ -58,6 +58,7 @@ while [[ "$#" -gt 0 ]]; do
     esac
 done
 
+(
 ## Set up directories
 #### Don't use absolute paths
 base_dir="."
@@ -162,7 +163,7 @@ echo -e "Use phi: $use_phi\n"
 
 rscript="${base_dir}/R/fdr-failed.R"
 
-(
+
 echo -e "Inputs:"
 echo -e "1) Sample_ID     = ${sample_id}"
 echo -e "2) BAM           = ${bam}"
