@@ -317,7 +317,7 @@ In cases like this the C>T mutations are not considered for artifact identificat
 ### Workaround
 If your VCF contains multiallelic sites, you may need to preprocess it to split these sites into biallelic ones before running the mobsnvf workflow.
 
-An easy way to do this is to using **bcftools**:
+An easy way to do this is by using **bcftools**:
 
 ```bash
 bcftools norm -m - -o output.vcf input.vcf
