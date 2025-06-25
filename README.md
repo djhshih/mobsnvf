@@ -82,7 +82,7 @@ pip install polars pysam numpy seaborn matplotlib
 
 #### Docker
 
-Alternatively, you may use the `Dockerfile` included with this repo to build and run a docker container. This solves all dependencies for compiling htspan and running the pipeline.
+Alternatively, you may use the `Dockerfile` included with this repo to build and run a docker container. This solves all dependencies for compiling htspan and running this pipeline.
 
 If docker is not installed on your system, follow instructions **[here](https://docs.docker.com/engine/install/ubuntu/)** to install docker or contact your system administrator if you don't have the privileges.
 
@@ -93,7 +93,9 @@ docker build -t mobsnvf .
 docker run --rm -it -v .:/home/work -w /home/work mobsnvf
 ```
 
-This will create and run an interactive Docker container, mounting the current directory into the `/work` directory inside the container and setting it as the working directory.
+This will create and run an interactive Docker container, mounting the current directory into the `/home/work` directory inside the container.
+
+_**Re-emphasis**_: The docker image includes dependencies for **htspan** but not **htspan** itself. So it still needs to be compiled from source as described in **[djhshih/htspan](https://github.com/djhshih/setup-linux)**. **Dlazy** is also not included in the Docker image, so you will need to install it separately if you want to use it.
 
 #### Conda
 
@@ -115,8 +117,9 @@ Then activate this environment with:
 ```bash
 conda activate mobsnvf
 ```
-
 And perform the tasks within this environment.
+
+_**Re-emphasis**_: The **htspan** and its dependency is not available via Conda, so you will still need to install its dependencies separately and compile it from source as described in the **Install htspan** section above.
 
 ## How to use this pipeline
 
