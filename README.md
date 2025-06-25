@@ -86,6 +86,7 @@ docker run --rm -it -v .:/work -w /work mobsnvf
 ```
 
 This will create and run an interactive Docker container, mounting the current directory into the `/work` directory inside the container and setting it as the working directory.
+
 ---
 
 ## How to use this pipeline
