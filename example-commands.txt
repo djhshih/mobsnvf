@@ -1,0 +1,9 @@
+./mobsnvf-workflow.sh --ref example-data/ref/tp53_hg38.fasta --bam example-data/bam/ffpe.bam --vcf example-data/vcf/ffpe.calls.vcf.gz./mobsnvf-workflow.sh --ref example-data/ref/tp53_hg38.fasta --bam example-data/bam/ffpe.bam --vcf example-data/vcf/ffpe.calls.vcf.gz
+
+python evaluate.py -r example-data/ref/tp53_hg38.fasta -v result/ffpe.calls/known_phi/ffpe.calls_filtered.vcf
+
+./mobsnvf-workflow.sh --ref example-data/ref/tp53_hg38.fasta --bam example-data/bam/ffpe.bam --vcf example-data/vcf/ffpe.calls.vcf.gz./mobsnvf-workflow.sh --ref example-data/ref/tp53_hg38.fasta --bam example-data/bam/ffpe.bam --vcf example-data/vcf/ffpe.calls.vcf.gz --use-phi false
+
+python evaluate.py -r example-data/ref/tp53_hg38.fasta -v result/ffpe.calls/unknown_phi/ffpe.calls_filtered.vcf
+
+python evaluate.py -r example-data/ref/tp53_hg38.fasta -v example-data/vcf/ffpe.calls.vcf.gz
