@@ -283,7 +283,7 @@ python evaluate.py \
     -v result/ffpe.calls/known_phi/ffpe.calls_filtered.vcf
 ```
 
-This script can also be used to evaluate tabular variant data such as .snv files. This will work as long as the file includes the **[`chrom`, `pos`, `ref`, `alt`]** columns.
+This script can also be used to evaluate tabular variant data such as .snv files. This will work as long as the file is tab delimited and includes the **[`chrom`, `pos`, `ref`, `alt`]** columns.
 
 By default, the output sample id will be inferred from the VCF filename, and the results will be saved to the same directory as the input VCF file.
 
