@@ -186,7 +186,7 @@ bash mobsnvf-workflow.sh \
     --vcf example-data/vcf/ffpe.calls.vcf.gz
 ```
 
-Upon successful completion, you will find the results in the `example-output/TCGA-A6-6650-test/known_phi/` directory.
+Upon successful completion, you will find the results in the `result/ffpe.calls/known_phi/` directory.
 
 ### Phi Parameter
 
@@ -295,3 +295,30 @@ Running the evaluation script will generate the following files in the specified
 -  **`{your_sample_name}_96c_mutations_count.tsv`**: A tab-separated file containing the mutation counts.
 -  **`{your_sample_name}_96c_mutations_signature.pdf`**: A PDF showing the 96 channel mutation signature plot along with total variant count and total C>T mutation count.
 
+
+## Issues to be resolved
+
+Currently, htspan mobsnvf does not handle multiallelic sites very well. As of right now multiallelic sites only work if the ref and first alt allele makes up for a `C>T` mutation. In this case the site is split into biallelic sites. In all other multiallelic cases only the first alt allele is retained in the output and the successive alleles besides are discarded.
+
+### How it affects the workflow
+
+The output from the mobsnvf module, i.e. `{sample_id}_{damage_type}.snv`, is only used to identify and mask artifacts in the VCF, resulting in the `{sample_id}_artifacts.vcf` and `{sample_id}_filtered.vcf` files. Therefore, the issue is mostly mitigated and only affects cases where successive alleles in a multiallelic site result in a `C>T` mutation. In such cases, these mutations are not analyzed for artifact identification.
+
+| CHR | POS | REF | ALT      |
+|-----|-----|-----|----------|
+| ... | ... | C   | A, T     |
+| ... | ... | C   | G, T     |
+| ... | ... | C   | GAA, T   |
+| ... | ... | G   | C, A     |
+| ... | ... | G   | TC, A    |
+
+In cases like this the C>T mutations are not considered for artifact identification.
+
+### Workaround
+If your VCF contains multiallelic sites, you may need to preprocess it to split these sites into biallelic ones before running the mobsnvf workflow.
+
+An easy way to do this is to using **bcftools**:
+
+```bash
+bcftools norm -m - -o output.vcf input.vcf
+```
