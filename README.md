@@ -72,7 +72,7 @@ sudo apt install r-base r-base-dev
 R -e 'install.packages(c("argparser","stringr"), repos="https://cloud.r-project.org")'
 ```
 
-The evaluation of the data requires python 3.12.10 and some python libraries.
+The evaluation of the data requires python and some additional python libraries.
 
 Python can be installed as follows:
 
