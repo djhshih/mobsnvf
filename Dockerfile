@@ -37,5 +37,3 @@ RUN conda install -y -c conda-forge -c bioconda gatk4=4.6.2.0 gsutil \
     python=3.12.10 pysam=0.23.3 numpy=2.3.0 polars=1.31.0 matplotlib=3.10.3 seaborn=0.13.2 \
     && conda clean -ya
 
-
-

@@ -27,6 +27,7 @@ This repository provides a pipeline for using the mobsnvf module of htspan for a
 
 ### Optional dependencies:
 *   gsutil
+*   dlazy (see **[djhshih/dlazy](https://github.com/djhshih/dlazy/tree/main)** for instructions on setting up dlazy)
 
 ## Setup Procedure
 
@@ -77,7 +78,7 @@ Then the python libraries can be installed using pip:
 pip install polars pysam numpy seaborn matplotlib
 ```
 
-### Alternate method
+### Alternate methods
 
 #### Docker
 
@@ -96,11 +97,11 @@ This will create and run an interactive Docker container, mounting the current d
 
 #### Conda
 
-Besides htspan, the rest of the dependencies can also be easily installed using Conda. This is useful if you don't have administrative privileges to install system-wide packages or if you prefer a more isolated environment.
+Except for htspan, the rest of the dependencies can also be easily installed using Conda. This is useful if you don't have administrative privileges to install system-wide packages or if you prefer an isolated environment.
 
 If you don't have Conda installed, you can follow the instructions [here](https://www.anaconda.com/docs/getting-started/miniconda/install#linux-terminal-installer).
 
-Once Conda is installed, you can create a new environment and install the required packages with the following commands:
+Once Conda is installed, create a new environment and install the required packages with the following commands:
 
 ```bash
 conda create -n mobsnvf -c conda-forge -c bioconda -c defaults \
@@ -115,9 +116,9 @@ Then activate this environment with:
 conda activate mobsnvf
 ```
 
+And perform the tasks within this environment.
+
 ## How to use this pipeline
-
-
 
 ### Command-Line Arguments
 
@@ -166,7 +167,7 @@ In this case the sample id will be inferred from the VCF filename, and the outpu
 
 If you are sure that your BAM uses a standard hg38 reference genome, you can use the `get.sh` script included in the ref directory to download it:
 
-**Note:** This requires gsutil to be installed on your system. If you don't have gsutil, you can install it by following the instructions [here](https://cloud.google.com/storage/docs/gsutil_install).
+**Note:** This requires gsutil to be installed on your system. If you don't have gsutil, you can install it by following the instructions [here](https://cloud.google.com/storage/docs/gsutil_install). This already comes prepackaged if you are following the **conda** or **docker** methods mentioned above.
 
 ```bash
 cd ref
@@ -297,11 +298,11 @@ Running the evaluation script will generate the following files in the specified
 
 ## Issues to be resolved
 
-Currently, htspan mobsnvf does not handle multiallelic sites very well. As of right now multiallelic sites only work if the ref and first alt allele makes up for a `C>T` mutation. In this case the site is split into biallelic sites. In all other multiallelic cases only the first alt allele is retained in the output and the successive alleles besides are discarded.
+Currently, htspan mobsnvf does not handle multiallelic sites very well. As of right now multiallelic sites are only handled as intended if the **ref** and first **alt** allele makes up for a **`C>T`** mutation. In this case the site is split into multiple biallelic sites. In all other multiallelic cases only the first alt allele is retained in the output and the successive alleles besides are discarded. It also discards all INDELs from its output.
 
 ### How it affects the workflow
 
-The output from the mobsnvf module, i.e. `{sample_id}_{damage_type}.snv`, is only used to identify and mask artifacts in the VCF, resulting in the `{sample_id}_artifacts.vcf` and `{sample_id}_filtered.vcf` files. Therefore, the issue is mostly mitigated and only affects cases where successive alleles in a multiallelic site result in a `C>T` mutation. In such cases, these mutations are not analyzed for artifact identification.
+The output from the mobsnvf module, i.e. `{sample_id}_{damage_type}.snv`, is only used to identify and mask artifacts in the VCF, which is used to generate the `{sample_id}_artifacts.vcf` and `{sample_id}_filtered.vcf` files. Therefore, the issue is mostly mitigated and only affects cases where the ref and the successive alt alleles in a multiallelic site result in a `C>T` mutation. In such cases, these mutations are not analyzed for artifact identification. For example:
 
 | CHR | POS | REF | ALT      |
 |-----|-----|-----|----------|
