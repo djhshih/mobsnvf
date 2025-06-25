@@ -183,7 +183,7 @@ You can run the test using the following command from the root of the repository
 bash mobsnvf-workflow.sh \
     --ref example-data/ref/tp53_hg38.fasta \
     --bam example-data/bam/ffpe.bam \
-    --vcf example-data/vcf/ffpe.calls.vcf.gz./
+    --vcf example-data/vcf/ffpe.calls.vcf.gz
 ```
 
 Upon successful completion, you will find the results in the `example-output/TCGA-A6-6650-test/known_phi/` directory.
