@@ -264,7 +264,7 @@ def SBS96_plot(sig, label = "", name = "", file = False, norm = False,
         
         if  np.round(np.sum (sig)) != 1:
             plt.annotate('Total Count : ' + format(np.sum(sig), ','), (0, np.max(sig)))
-            plt.annotate('C>T Count : ' + format(np.sum(sig[32:48]), ','), (0, np.max(sig)+0.5))
+            plt.annotate('C>T Count : ' + format(np.sum(sig[32:48]), ','), (0, np.max(sig)+2))
         plt.ylabel("Number of\nSBSs", size = 14)
         plt.annotate (name,(90 - len(name), np.max(sig) * 0.95), size = s)
     
