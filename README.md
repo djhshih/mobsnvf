@@ -228,3 +228,37 @@ To process multiple samples, we recommend creating a manifest file and looping t
     ```bash
     dlazy job
     ```
+
+## Evaluation
+
+An evaluation python script is included with this repository to analyse the mutation profile, mutation counts, and mutation signature plots for the VCF files.
+
+### Example Usage
+
+To run the evaluation script, you can use the following command:
+
+```bash
+python3 evaluate.py \
+    --var-path "/path/to/your/variants.vcf" \
+    --ref-path "/path/to/your/reference.fasta" \
+    --outdir "/path/to/your/output" \
+    --sample-name "your_sample_name"
+```
+
+Usage using example data:
+
+```bash
+    python evaluate.py \
+        -r example-data/ref/tp53_hg38.fasta \
+        -v result/ffpe.calls/known_phi/ffpe.calls_filtered.vcf
+```
+
+By default, the output sample id will be inferred from the VCF filename, and the results will be saved to the same directory as the input VCF file.
+
+### Outputs
+
+Running the evaluation script will generate the following files in the specified output directory:
+
+-  **`{your_sample_name}_96c_mutations_profiles.tsv`**: A tab-separated file containing the mutation profile.
+-  **`{your_sample_name}_96c_mutations_count.tsv`**: A tab-separated file containing the mutation counts.
+-  **`{your_sample_name}_96c_mutations_signature.pdf`**: A PDF image of the 96 channel mutation signature plot.
