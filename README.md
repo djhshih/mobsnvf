@@ -51,13 +51,13 @@ git clone https://github.com/djhshih/mobsnvf.git
 
 ## Installing dependencies
 
-The dependencies for **htspan** and ways to install them are mentioned in it's respective repostory:
+The dependencies for **htspan** and its installation guide is available in its own repository (**[djhshih/htspan](https://github.com/djhshih/htspan)**), as mentioned previously. The remaining dependencies can be installed as mentioned below.
 
-This pipeline also relies on R, R packages and GATK.
+This main artifact filtering pipeline relies on R, two R packages, and GATK.
 
 GATK can be installed according to the [instructions provided here](https://gatk.broadinstitute.org/hc/en-us/articles/360036194592-Getting-started-with-GATK4).
 
-The R packages may be installed as follows:
+The R packages may be installed as follows in a debian-based system (e.g., Ubuntu):
 
 ```bash
 sudo apt install r-base r-base-dev
@@ -66,7 +66,7 @@ R -e 'install.packages(c("argparser","stringr"), repos="https://cloud.r-project.
 
 The evaluation of the data requires python and some additional python libraries.
 
-Python can be installed as follows:
+Python can be installed as follows in a debian-based system (e.g., Ubuntu):
 
 ```bash
 sudo apt update && sudo apt install python3 python3-pip
@@ -95,7 +95,7 @@ docker run --rm -it -v .:/home/work -w /home/work mobsnvf
 
 This will create and run an interactive Docker container, mounting the current directory into the `/home/work` directory inside the container.
 
-_**Re-emphasis**_: The docker image includes dependencies for **htspan** but not **htspan** itself. So it still needs to be compiled from source as described in **[djhshih/htspan](https://github.com/djhshih/setup-linux)**. **Dlazy** is also not included in the Docker image, so you will need to install it separately if you want to use it.
+_**Re-emphasis**_: The docker image includes the dependencies for compiling **htspan** but not **htspan** itself. Therefore, it still needs to be compiled from source as described in **[djhshih/htspan](https://github.com/djhshih/setup-linux)**. **Dlazy** is also not included in the Docker image, so you will need to install it separately if you want to use it.
 
 #### Conda
 
@@ -177,6 +177,14 @@ cd ref
 bash get.sh
 ```
 
+### Phi Parameter
+
+The parameter **phi** is an estimate of the extent of artificial DNA damage.
+
+Setting the `--use-phi` flag to `true` (the default) will estimate phi with `hts-mobsnvf quantify` and use this single value when identifying artifacts across all sites with `hts-mobsnvf identify`. This is the recommended approach as it generally improves accuracy.
+
+When `--use-phi` is set to `false`, the initial phi estimation step is skipped, and `hts-mobsnvf identify` will instead estimate the extent of DNA damage (phi) individually for each SNV site.
+
 ### Testing the Pipeline with Example Data
 
 This repository includes an `example-data` directory containing a simple ffpe BAM and VCF file along with a matched normal VCF. This allows you to perform a test run to ensure that your environment is configured correctly and the pipeline works as expected.
@@ -192,13 +200,6 @@ bash mobsnvf-workflow.sh \
 
 Upon successful completion, you will find the results in the `result/ffpe.calls/known_phi/` directory.
 
-### Phi Parameter
-
-The parameter **phi** is an estimate of the extent of artificial DNA damage.
-
-Setting the `--use-phi` flag to `true` (the default) will estimate phi with `hts-mobsnvf quantify` and use this single value when identifying artifacts across all sites with `hts-mobsnvf identify`. This is the recommended approach as it generally improves accuracy.
-
-When `--use-phi` is set to `false`, the initial phi estimation step is skipped, and `hts-mobsnvf identify` will instead estimate the extent of DNA damage (phi) individually for each SNV site.
 
 ### Results
 
@@ -216,11 +217,11 @@ The primary output files are:
 
 ### Running multiple samples
 
-To process multiple samples, we recommend creating a manifest file and looping through it.
+To process multiple samples, we recommend creating a manifest file and looping through it. However, you can feel free to adapt to your own needs.
 
 1.  **Create a manifest file**
 
-    Create a tab-separated values (TSV) file (e.g., `samples.tsv`) with columns for the sample ID and the absolute paths to the corresponding BAM and VCF files.
+    Create a tab-separated values (TSV) file (e.g., `samples.tsv`) with absolute paths to the corresponding BAM and VCF files.
 
     **Example `samples.tsv`:**
 
@@ -261,6 +262,8 @@ To process multiple samples, we recommend creating a manifest file and looping t
     ```bash
     dlazy job
     ```
+
+    Dlazy prepares logs for each job and makes it easy to resume or rerun jobs in case of failures.
 
 ## Evaluation
 
