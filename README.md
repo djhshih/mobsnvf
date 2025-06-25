@@ -23,8 +23,8 @@ This repository provides a pipeline for using the mobsnvf module of htspan for a
 *   libbz2-dev
 
 ### R libraries:
-*   `stringr`
-*   `argparser`
+*   stringr
+*   argparser
 
 ### Python libraries:
 *   polars
@@ -38,7 +38,7 @@ This repository provides a pipeline for using the mobsnvf module of htspan for a
 
 ## Setup Procedure
 
-If your system does git installed, please setup and configure git first. You may take a look here for a **[demonstration](https://github.com/djhshih/setup-linux)**.
+If your system does **git** installed, please setup and configure **git** first. You may take a look here for a **[demonstration](https://github.com/djhshih/setup-linux)**.
 
 ```bash
 sudo apt install git
@@ -70,6 +70,20 @@ The R packages may be installed as follows:
 ```bash
 sudo apt install r-base r-base-dev
 R -e 'install.packages(c("argparser","stringr"), repos="https://cloud.r-project.org")'
+```
+
+The evaluation of the data requires python 3.12.10 and some python libraries.
+
+Python can be installed as follows:
+
+```bash
+sudo apt update && sudo apt install python3 python3-pip
+```
+
+Then the python libraries can be installed using pip:
+
+```bash
+pip install polars pysam numpy seaborn matplotlib
 ```
 
 ### Alternate method
