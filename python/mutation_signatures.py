@@ -64,7 +64,8 @@ def import_formatted_vcf(vcf_path, sample_name, snv_only = True, normal_chr=True
 			})
 		)
 	elif vcf_path.endswith(".snv"):
-		vcf = pl.read_csv(vcf_path, separator="\t", infer_schema_length=10000) #columns=["chrom", "pos", "ref", "alt"]
+		vcf = pl.read_csv(vcf_path, separator="\t", infer_schema_length=10000)
+		vcf = vcf.rename({col: col.lower() for col in vcf.columns})
 		
 	
 	vcf = (

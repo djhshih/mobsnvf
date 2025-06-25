@@ -11,27 +11,19 @@ This repository provides a pipeline for using the mobsnvf module of htspan for a
 
 *   htspan (see **[djhshih/htspan](https://github.com/djhshih/setup-linux)** for instructions on setting up htspan)
 *   R 4.4.3
-*   Python 3.12.10
-*   GATK 4.6.2.0
-*   libcurl-dev 8.14.1
-*   liblzma-dev 5.4.5
-*   bzip2 1.22
-*   cmake 4.0.3
-*   g++ 13.3.0
-*   gcc 13.3.0
-*   zlib1g-dev
-*   libbz2-dev
+*   python 3.12.10
+*   gatk 4.6.2.0
 
 ### R libraries:
-*   stringr
-*   argparser
+*   stringr 1.5.1
+*   argparser 0.7.2
 
 ### Python libraries:
-*   polars
-*   pysam
-*   numpy
-*   seaborn
-*   matplotlib
+*   polars 1.31.0
+*   pysam 0.23.3
+*   numpy 2.3.0
+*   seaborn 0.13.2
+*   matplotlib 3.10.3
 
 ### Optional dependencies:
 *   gsutil
@@ -54,7 +46,6 @@ Then clone this `mobsnvf` repo:
 
 ```bash
 git clone https://github.com/djhshih/mobsnvf.git
-cd mobsnvf
 ```
 
 ## Installing dependencies
@@ -88,6 +79,8 @@ pip install polars pysam numpy seaborn matplotlib
 
 ### Alternate method
 
+#### Docker
+
 Alternatively, you may use the `Dockerfile` included with this repo to build and run a docker container. This solves all dependencies for compiling htspan and running the pipeline.
 
 If docker is not installed on your system, follow instructions **[here]** to install docker or contact your system administrator if you don't have the privileges.
@@ -96,10 +89,31 @@ Then navigate to the cloned `mobsnvf/` repo and use the following commands to ma
 
 ```bash
 docker build -t mobsnvf .
-docker run --rm -it -v .:/work -w /work mobsnvf
+docker run --rm -it -v .:/home/work -w /home/work mobsnvf
 ```
 
 This will create and run an interactive Docker container, mounting the current directory into the `/work` directory inside the container and setting it as the working directory.
+
+#### Conda
+
+Besides htspan, the rest of the dependencies can also be easily installed using Conda. This is useful if you don't have administrative privileges to install system-wide packages or if you prefer a more isolated environment.
+
+If you don't have Conda installed, you can follow the instructions [here](https://www.anaconda.com/docs/getting-started/miniconda/install#linux-terminal-installer).
+
+Once Conda is installed, you can create a new environment and install the required packages with the following commands:
+
+```bash
+conda create -n mobsnvf -c conda-forge -c bioconda -c defaults \
+    r-base=4.4.3 r-argparser=0.7.2 r-stringr=1.5.1 \
+    python=3.12.10 pysam=0.23.3 numpy=2.3.0 polars=1.31.0 matplotlib=3.10.3 seaborn=0.13.2 \
+    gatk=4.6.2.0
+```
+
+Then activate this environment with:
+
+```bash
+conda activate mobsnvf
+```
 
 ## How to use this pipeline
 
@@ -246,7 +260,7 @@ To process multiple samples, we recommend creating a manifest file and looping t
 
 ## Evaluation
 
-An evaluation python script is included with this repository to analyse the mutation profile, mutation counts, and mutation signature plots for the VCF files.
+An evaluation python script (`evaluate.py`) is included with this repository to analyse the mutation profile, mutation counts, and mutation signature plots for the vartiant (VCF/SNV) files.
 
 ### Example Usage
 
@@ -268,6 +282,8 @@ python evaluate.py \
     -v result/ffpe.calls/known_phi/ffpe.calls_filtered.vcf
 ```
 
+This script can also be used to evaluate tabular variant data such as .snv files. This will work as long as the file includes the **[`chrom`, `pos`, `ref`, `alt`]** columns.
+
 By default, the output sample id will be inferred from the VCF filename, and the results will be saved to the same directory as the input VCF file.
 
 ### Outputs
@@ -276,4 +292,4 @@ Running the evaluation script will generate the following files in the specified
 
 -  **`{your_sample_name}_96c_mutations_profiles.tsv`**: A tab-separated file containing the mutation profile.
 -  **`{your_sample_name}_96c_mutations_count.tsv`**: A tab-separated file containing the mutation counts.
--  **`{your_sample_name}_96c_mutations_signature.pdf`**: A PDF image of the 96 channel mutation signature plot.
+-  **`{your_sample_name}_96c_mutations_signature.pdf`**: A PDF showing the 96 channel mutation signature plot along with total variant count and total C>T mutation count.

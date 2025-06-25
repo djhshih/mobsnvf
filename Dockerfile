@@ -32,8 +32,9 @@ RUN echo '' >> /root/.bashrc \
     && echo '# Initialize conda' >> /root/.bashrc \
     && echo 'source /opt/conda/etc/profile.d/conda.sh && conda activate base' >> /root/.bashrc
 
-# Install GATK4 and gsutil
-RUN conda install -y -c bioconda -c conda-forge gatk4 gsutil \
+# Install GATK4, gsutil, python, and python packages
+RUN conda install -y -c conda-forge -c bioconda gatk4=4.6.2.0 gsutil \
+    python=3.12.10 pysam=0.23.3 numpy=2.3.0 polars=1.31.0 matplotlib=3.10.3 seaborn=0.13.2 \
     && conda clean -ya
 
 
