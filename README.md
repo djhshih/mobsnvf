@@ -84,7 +84,7 @@ pip install polars pysam numpy seaborn matplotlib
 
 Alternatively, you may use the `Dockerfile` included with this repo to build and run a docker container. This solves all dependencies for compiling htspan and running the pipeline.
 
-If docker is not installed on your system, follow instructions **[here]** to install docker or contact your system administrator if you don't have the privileges.
+If docker is not installed on your system, follow instructions **[here](https://docs.docker.com/engine/install/ubuntu/)** to install docker or contact your system administrator if you don't have the privileges.
 
 Then navigate to the cloned `mobsnvf/` repo and use the following commands to make a Docker image and run an interactive Docker container:
 
