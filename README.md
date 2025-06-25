@@ -10,17 +10,17 @@ This repository provides a pipeline for using the mobsnvf module of htspan for a
 ## Dependencies
 
 *   htspan (see **[djhshih/htspan](https://github.com/djhshih/setup-linux)** for instructions on setting up htspan)
-*   R 4.4.3
+*   R v4.4.3
 *   Python 3.12.10
-*   GATK 4.2.2.0
-*   bzip2 1.0 (for htslib)
-*   libcurl-dev 7.64 (for htslib, any implementation)
-*   liblzma-dev 5.2.4 (for htslib)
+*   GATK 4.6.2.0
+*   libcurl-dev 8.14.1
+*   liblzma-dev 5.4.5
+*   bzip2 1.22
+*   cmake 4.0.3
+*   g++ 13.3.0
+*   gcc 13.3.0
 *   zlib1g-dev
 *   libbz2-dev
-*   cmake
-*   g++
-*   gcc
 
 ### R libraries:
 *   `stringr`
