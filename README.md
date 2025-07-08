@@ -140,7 +140,7 @@ _**Re-emphasis**_: The **htspan** and its dependency is not available via Conda,
 
 Below is a typical command to run the pipeline for a single sample. You must provide the paths to your BAM, VCF, and reference genome.
 
-The workflow requires explicit file paths for inputs unless they are placed in the `ref`, `bam` and `vcf` directories within the repository. In this case they can be just referred to by their filenames. The input files i.e. the BAM, VCF and Reference Fenome must be indexed.
+The workflow requires explicit file paths for inputs unless they are placed in the `ref`, `bam` and `vcf` directories within the repository. In this case they can be just referred to by their filenames. The input files i.e. the BAM, VCF and Reference Genome must be indexed.
 
 **Note:** It is important that the Reference Fasta provided is the same as the one used for sequence alignment.
 
@@ -168,7 +168,7 @@ In this case the sample id will be inferred from the VCF filename, and the outpu
 
 ### Reference Genome
 
-If you are sure that your BAM uses a standard hg38 reference genome, you can use the `get.sh` script included in the ref directory to download it:
+If you are **sure** that your BAM uses a standard hg38 reference genome, you can use the `get.sh` script included in the ref directory to download it:
 
 **Note:** This requires gsutil to be installed on your system. If you don't have gsutil, you can install it by following the instructions [here](https://cloud.google.com/storage/docs/gsutil_install). This already comes prepackaged if you are following the **conda** or **docker** methods mentioned above.
 
