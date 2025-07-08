@@ -28,7 +28,7 @@ def main():
     variants_96c = ms.variants_mut_profile(args.var_path, sample_name, ref_genome)
     mutaion_counts_96c = ms.create_96c_mutation_counts(variants_96c)
 
-    variants_96c.write_csv(f"{out_dir}/{sample_name}_mutation_profiles.tsv", separator="\t")
+    variants_96c.write_csv(f"{out_dir}/{sample_name}_96c_mutation_profiles.tsv", separator="\t")
     print(f"Saved mutation profiles to: {out_dir}/{sample_name}_96c_mutation_profiles.tsv")
     
     mutaion_counts_96c.write_csv(f"{out_dir}/{sample_name}_96c_mutation_count.tsv", separator="\t")
