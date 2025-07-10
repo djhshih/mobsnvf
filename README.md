@@ -109,7 +109,7 @@ Once Conda is installed, create a new environment and install the required packa
 conda create -n mobsnvf -c conda-forge -c bioconda -c defaults \
     r-base==4.4.2 r-argparser=0.7.2 r-stringr=1.5.1 \
     python=3.12.11 pysam=0.23.3 numpy=2.3.0 polars=1.31.0 matplotlib=3.10.3 seaborn=0.13.2 \
-    gatk4=4.6.2.0 gsutil=5.35
+    gatk4=4.6.2.0 gsutil=5.28
 ```
 
 Then activate this environment with:
